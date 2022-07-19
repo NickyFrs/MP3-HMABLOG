@@ -23,10 +23,22 @@
          <!-- Responsive navbar-->
         {% include "navbar.html" %}
 <body>
+    <!-- MESSAGES NOTIFICATIONS -->
+    <section>
+        {% for message in get_flashed_messages() %}
+            <div class="alert alert-warning alert-dismissible fade show" role="alert">
+              <strong>{{ message }}</strong>
+              <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+        {% endfor %}
+    </section>
 
-{% block content %}
+    <main>
+        {% block content %}
 
-{% endblock content %}
+        {% endblock content %}
+    </main>
+
 
 
      <!-- Footer-->

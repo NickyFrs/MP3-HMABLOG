@@ -1,6 +1,6 @@
-from flask import Flask, render_template
+from flask import Flask, render_template, flash
 from flask_wtf import FlaskForm
-from wtforms import StringField, SubmitField
+from wtforms import StringField, SubmitField, PasswordField, TextAreaField
 from wtforms.validators import DataRequired, EqualTo, EqualTo, Email
 
 app = Flask(__name__)
@@ -11,7 +11,7 @@ app.config['SECRET_KEY'] = 'b41bfb66739bd67d09342ad24f6a699deb7cbac892273d95'
 # Crated form CLass
 class NameForm(FlaskForm):
     name = StringField("Name", validators=[DataRequired()])
-    submit = StringField("Submit")
+    submit = SubmitField("Submit")
 
 
 @app.route('/')
@@ -33,7 +33,7 @@ def name():
     if form.validate_on_submit():
         name = form.name.data
         form.name.data = ''
-
+        flash("Form Submitted Successfully")
     return render_template('name.html', name=name, form=form)
 
 
