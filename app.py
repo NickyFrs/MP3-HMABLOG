@@ -1,4 +1,4 @@
-from flask import Flask, render_template, flash, request
+from flask import Flask, render_template, flash, request, redirect, url_for
 from flask_wtf import FlaskForm
 from werkzeug.security import generate_password_hash, check_password_hash
 from wtforms import StringField, SubmitField, PasswordField, TextAreaField, ValidationError
@@ -92,10 +92,48 @@ def home():
 def user(name):
     return render_template('user.html', name=name)
 
+# INDIVIDUAL POST PAGE
+@app.route('/posts/<int:id>') # INT:ID WILL GET THE CLICKED POST TO VIEW FROM THE DB
+def post(id):
+    # grab all the posts from the database
+    post = Posts.query.get_or_404(id)
+    return render_template('post.html', post=post)
 
+# ALL POSTS PAGE
 @app.route('/posts')
-def posts(posts):
-    return render_template('posts.html')
+def posts():
+    # grab all the posts from the database
+    posts = Posts.query.order_by(Posts.date_posted)
+    return render_template('posts.html', posts=posts)
+
+
+# TO EDIT A POST
+@app.route('/posts/edit/<int:id>', methods=['GET', 'POST']) # INT:ID WILL LET UD EDIT AND INDIVIDUAL POST
+def edit_post(id):
+    # grab all the posts from the database
+    post = Posts.query.get_or_404(id)
+    form = PostForm()
+
+    if form.validate_on_submit():
+        post.title = form.title.data
+        content = form.content.data
+        author =form.author.data
+        slug =form.slug.data
+
+        # Update post on the database
+        db.session.add(post)
+        db.session.commit()
+
+        flash('Post has be updated successfully')
+        return redirect(url_for('post', id=post.id))
+
+    form.title.data = post.title
+    form.content.data = post.content
+    form.author.data = post.author
+    form.slug.data = post.slug
+
+    return render_template('edit_post.html', form=form)
+
 
 
 # ADD POSTS TO THE DATABASE
