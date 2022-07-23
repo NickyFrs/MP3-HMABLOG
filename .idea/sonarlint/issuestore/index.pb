@@ -8,3 +8,7 @@ E
 static/css/styles.css,f\f\ff5f6247d17a4d94e3cf2aed570cdefe538f01e5
 D
 static/js/scripts.js,4\d\4dc6053ee96817d0caa0ea943ea6d475fa3593b2
+B
+templates/404.html,6\8\68a8bfc84a821a32ae5ba7dad3051cb12d1529b3
+e
+5migrations/versions/b7d05643aa3a_initial_migration.py,8\a\8a1c740fe659d3d88fb19b288c5ed80c63e8af71
