@@ -6,7 +6,7 @@ from wtforms.validators import DataRequired, EqualTo, Email, length
 from flask_sqlalchemy import SQLAlchemy
 from flask_migrate import Migrate
 from datetime import datetime
-
+from flask_login import current_user, UserMixin, LoginManager, login_user, login_required, logout_user
 
 app = Flask(__name__)
 
@@ -20,8 +20,9 @@ migrate = Migrate(app, db)
 
 
 # DATABASE MODEL
-class Users(db.Model):
+class Users(db.Model, UserMixin):
     id = db.Column(db.Integer, primary_key=True)
+    username = db.Column(db.String(20), unique=True, nullable=False)
     name = db.Column(db.String(50), nullable=False)
     email = db.Column(db.String(100), unique=True, nullable=False)
     favorite_color = db.Column(db.String(120))
@@ -46,6 +47,7 @@ class Users(db.Model):
     def __repr__(self):
         return '<Name %r>' % self.name
 
+
 # BLOG POST MODEL
 class Posts(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -67,6 +69,7 @@ class PostForm(FlaskForm):
 
 # USER FORM
 class UserForm(FlaskForm):
+    username = StringField("Username", validators=[DataRequired()])
     name = StringField("Name", validators=[DataRequired()])
     email = StringField("Email", validators=[DataRequired(), Email()])
     favorite_color = StringField("Favorite Color")
@@ -92,12 +95,14 @@ def home():
 def user(name):
     return render_template('user.html', name=name)
 
+
 # INDIVIDUAL POST PAGE
-@app.route('/posts/<int:id>') # INT:ID WILL GET THE CLICKED POST TO VIEW FROM THE DB
+@app.route('/posts/<int:id>')  # INT:ID WILL GET THE CLICKED POST TO VIEW FROM THE DB
 def post(id):
     # grab all the posts from the database
     post = Posts.query.get_or_404(id)
     return render_template('post.html', post=post)
+
 
 # ALL POSTS PAGE
 @app.route('/posts')
@@ -108,17 +113,17 @@ def posts():
 
 
 # TO EDIT A POST
-@app.route('/posts/edit/<int:id>', methods=['GET', 'POST']) # INT:ID WILL LET UD EDIT AND INDIVIDUAL POST
+@app.route('/posts/edit/<int:id>', methods=['GET', 'POST'])  # INT:ID WILL LET UD EDIT AND INDIVIDUAL POST
 def edit_post(id):
-    # grab all the posts from the database
+    # grab the posts from the database
     post = Posts.query.get_or_404(id)
     form = PostForm()
 
     if form.validate_on_submit():
         post.title = form.title.data
-        content = form.content.data
-        author =form.author.data
-        slug =form.slug.data
+        post.content = form.content.data
+        post.author = form.author.data
+        post.slug = form.slug.data
 
         # Update post on the database
         db.session.add(post)
@@ -135,7 +140,6 @@ def edit_post(id):
     return render_template('edit_post.html', form=form)
 
 
-
 # ADD POSTS TO THE DATABASE
 @app.route('/add_post', methods=['GET', 'POST'])
 def add_post():
@@ -149,7 +153,7 @@ def add_post():
         form.author.data = ''
         form.slug.data = ''
 
-        # add post tho the datababe
+        # add post tho the database
         db.session.add(post)
         db.session.commit()
 
@@ -157,6 +161,28 @@ def add_post():
         flash('Blog post added successfully')
     return render_template('add_post.html', form=form, name=name)
 
+
+# DELETE POST FROM THE DATABASE
+@app.route('/posts/delete/<int:id>')  # INT:ID WILL LET UD EDIT AND INDIVIDUAL POST
+def delete_post(id):
+    post_to_delete = Posts.query.get_or_404(id)
+    try:
+        # Delete post from the database
+        db.session.delete(post_to_delete)
+        db.session.commit()
+
+        # Return message
+        flash('Blog post deleted successfully')
+
+        posts = Posts.query.order_by(Posts.date_posted) # Query DB again
+        return render_template('posts.html', posts=posts) # and redirect to the posts page
+
+    except:
+        # If error, show message
+        flash('There was a problem deleting the post')
+        # an d redirect again
+        posts = Posts.query.order_by(Posts.date_posted)  # Query DB again
+        return render_template('posts.html', posts=posts)  # and redirect to the posts page
 
 # ADD USERS TO THE DATABASE
 @app.route('/user/add', methods=['GET', 'POST'])
@@ -167,11 +193,12 @@ def add_user():
         user = Users.query.filter_by(email=form.email.data).first()
         if user is None:
             hashed_pwd = generate_password_hash('form.password_hash.data', "sha256")
-            user = Users(name=form.name.data, email=form.email.data, favorite_color=form.favorite_color.data,
+            user = Users(username=form.username.data, name=form.name.data, email=form.email.data, favorite_color=form.favorite_color.data,
                          password_hash=hashed_pwd)
             db.session.add(user)
             db.session.commit()
         name = form.name.data
+        form.username.data = ''
         form.name.data = ''
         form.email.data = ''
         form.favorite_color.data = ''
@@ -205,7 +232,7 @@ def update(id):
         return render_template('update.html', form=form, name_to_update=name_to_update, id=id)
 
 
-# UPDATE DATABASE RECORDS
+# DELETE USER FROM DATABASE RECORDS
 @app.route('/delete/<int:id>')
 def delete(id):
     user_to_delete = Users.query.get_or_404(id)
@@ -271,7 +298,8 @@ def test_pw():
         # check hashed password
         passed = check_password_hash(pw_to_check.password_hash, password)
 
-    return render_template('test_pw.html', email=email, password=password, form=form, pw_to_check=pw_to_check, passed=passed)
+    return render_template('test_pw.html', email=email, password=password, form=form, pw_to_check=pw_to_check,
+                           passed=passed)
 
 
 # Invalid URL
