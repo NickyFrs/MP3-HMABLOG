@@ -1,0 +1,33 @@
+{% extends "base.html" %}
+
+{% block content %}
+    {% if name %}
+        <h1>hello {{ name }}</h1>
+        <br /><br />
+    {% else %}
+        <h1>Add a Blog Post</h1>
+        <br />
+        <div class="shadow p-3 mb-5 bg-body rounded">
+            <form action="#" method="POST" class="form-control">
+                {{ form.hidden_tag() }}
+
+                {{ form.title.label(class="form-label") }}
+                {{ form.title(class="form-control") }}
+                <br />
+                {{ form.author.label(class="form-label") }}
+                {{ form.author(class="form-control") }}
+                <br />
+                {{ form.slug.label(class="form-label") }}
+                {{ form.slug(class="form-control") }}
+                <br />
+                {{ form.content.label(class="form-label") }}
+                {{ form.content(class="form-control", rows= "10") }}
+
+
+                <br />
+                {{ form.submit(class="btn btn-primary") }}
+            </form>
+        </div>
+
+    {% endif %}
+{% endblock content %}

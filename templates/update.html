@@ -1,0 +1,46 @@
+{% extends "base.html" %}
+
+{% block content %}
+    {% if name %}
+        <h1>hello {{ name }}</h1>
+        <br /><br />
+        <table class="table table-hover table-bordered table-striped">
+            {% for our_user in our_users %}
+                <tr>
+                    <td>{{ our_user.id }}. {{ our_user.name }} - {{ our_user.email }} - {{ our_user.favorite_color }}</td>
+                </tr>
+            {% endfor %}
+        </table>
+    {% else %}
+        <h1>Update User...</h1>
+        <br />
+        <div class="shadow p-3 mb-5 bg-body rounded">
+            <form action="/update/{{ name_to_update.id }}" method="POST" class="form-control">
+                {{ form.hidden_tag() }}
+
+                {{ form.name.label(class="form-control") }}
+                {{ form.name(class="form-label", value=name_to_update.name) }}
+                <br />
+                {{ form.email.label(class="form-control") }}
+                {{ form.email(class="form-label", value=name_to_update.email) }}
+                <br />
+                {{ form.favorite_color.label(class="form-control") }}
+                {{ form.favorite_color(class="form-label", value=name_to_update.favorite_color) }}
+
+                <br />
+                {{ form.submit(class="btn btn-primary") }} <a href="{{ url_for('delete', id=id) }}" class="btn btn-danger">Delete</a>
+            </form>
+        </div>
+        <table class="table table-hover table-bordered table-striped">
+            {% for our_user in our_users %}
+                <tr>
+                    <td>{{ our_user.id }}. {{ our_user.name }} - {{ our_user.email }} - {{ our_user.favorite_color }}</td>
+                </tr>
+            {% endfor %}
+        </table>
+
+
+
+
+    {% endif %}
+{% endblock content %}
