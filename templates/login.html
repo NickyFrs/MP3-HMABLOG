@@ -7,17 +7,11 @@
             <form action="" method="POST" class="form-control">
                 {{ form.hidden_tag() }}
 
-                {{ form.username.label(class="form-control") }}
-                {{ form.username(class="form-label") }}
+                {{ form.email.label(class="form-label") }}
+                {{ form.email(class="form-control") }}
                 <br />
-                {{ form.email.label(class="form-control") }}
-                {{ form.email(class="form-label") }}
-                <br />
-                {{ form.password_hash.label(class="form-control") }}
-                {{ form.password_hash(class="form-label") }}
-                <br />
-                {{ form.password_hash2.label(class="form-control") }}
-                {{ form.password_hash2(class="form-label") }}
+                {{ form.password.label(class="form-label") }}
+                {{ form.password(class="form-control") }}
                 <br />
 
 

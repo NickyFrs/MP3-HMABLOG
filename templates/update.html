@@ -18,14 +18,18 @@
             <form action="/update/{{ name_to_update.id }}" method="POST" class="form-control">
                 {{ form.hidden_tag() }}
 
-                {{ form.name.label(class="form-control") }}
-                {{ form.name(class="form-label", value=name_to_update.name) }}
+                {{ form.username.label(class="form-label") }}
+                {{ form.username(class="form-control", value=name_to_update.name) }}
                 <br />
-                {{ form.email.label(class="form-control") }}
-                {{ form.email(class="form-label", value=name_to_update.email) }}
+                {{ form.name.label(class="form-label") }}
+                {{ form.name(class="form-control", value=name_to_update.email) }}
                 <br />
-                {{ form.favorite_color.label(class="form-control") }}
-                {{ form.favorite_color(class="form-label", value=name_to_update.favorite_color) }}
+
+                {{ form.email.label(class="form-label") }}
+                {{ form.email(class="form-control", value=name_to_update.email) }}
+                <br />
+                {{ form.favorite_color.label(class="form-label") }}
+                {{ form.favorite_color(class="form-control", value=name_to_update.favorite_color) }}
 
                 <br />
                 {{ form.submit(class="btn btn-primary") }} <a href="{{ url_for('delete', id=id) }}" class="btn btn-danger">Delete</a>
@@ -38,9 +42,6 @@
                 </tr>
             {% endfor %}
         </table>
-
-
-
 
     {% endif %}
 {% endblock content %}

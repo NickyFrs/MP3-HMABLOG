@@ -1,10 +1,9 @@
 {% extends "base.html" %}
 
 {% block content %}
-    {% if name %}
-        <h1>hello {{ name }}</h1>
+    {% if current_user.is_authenticated %}
+        <h1>hello {{ user.name.data|capitalize }}</h1>
         <br /><br />
-    {% else %}
         <h1>Add a Blog Post</h1>
         <br />
         <div class="shadow p-3 mb-5 bg-body rounded">
@@ -22,12 +21,18 @@
                 <br />
                 {{ form.content.label(class="form-label") }}
                 {{ form.content(class="form-control", rows= "10") }}
-
-
                 <br />
                 {{ form.submit(class="btn btn-primary") }}
             </form>
         </div>
 
+    {% else %}
+        <h3>Must be logged in</h3>
+        <p>Sorry... you must be logged to access this feature.<br/>
+        Please log in or register to access.
+        </p>
+
+        <a href="{{ url_for('add_user') }}">Register here</a> or <a href="{{ url_for('login') }}">Login here</a>
+        <br />
     {% endif %}
 {% endblock content %}

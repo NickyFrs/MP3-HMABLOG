@@ -1,28 +1,45 @@
 {% extends "base.html" %}
 
 {% block content %}
+   <h1>Dashboard</h1>
+   <hr>
+   <h2>Hi {{ current_user.name|capitalize }}!</h2>
+   <p>You are now logged in</p>
+   <br/>
 
+    <strong>Username</strong>: {{ current_user.username }}<br/>
+    <strong>Name</strong>: {{ current_user.name}}<br/>
+    <strong>Email</strong>: {{ current_user.email }}<br/>
+    <strong>Favorite Color</strong>: {{ current_user. favorite_color}}<br/>
+    <strong>Date Joined</strong>: {{ current_user.data_added }}<br/>
+
+    <br/><br/>
+    <a href="{{ url_for('update', id=current_user.id) }}" class="btn btn-warning">Update Profile</a>
+    <a href="{{ url_for('delete', id=current_user.id) }}" class="btn btn-danger">Delete</a>
+    <a href="{{ url_for('logout') }}" class="btn btn-outline-success">Logout</a>
+    <br/><br/>
+
+    <h1>Update Profile...</h1>
         <br />
         <div class="shadow p-3 mb-5 bg-body rounded">
-            <form action="" method="POST" class="form-control">
+            <form action="/dashboard" method="POST" class="form-control">
                 {{ form.hidden_tag() }}
 
-                {{ form.username.label(class="form-control") }}
-                {{ form.username(class="form-label") }}
+                {{ form.username.label(class="form-label") }}
+                {{ form.username(class="form-control", value=name_to_update.name) }}
                 <br />
-                {{ form.email.label(class="form-control") }}
-                {{ form.email(class="form-label") }}
-                <br />
-                {{ form.password_hash.label(class="form-control") }}
-                {{ form.password_hash(class="form-label") }}
-                <br />
-                {{ form.password_hash2.label(class="form-control") }}
-                {{ form.password_hash2(class="form-label") }}
+                {{ form.name.label(class="form-label") }}
+                {{ form.name(class="form-control", value=name_to_update.email) }}
                 <br />
 
+                {{ form.email.label(class="form-label") }}
+                {{ form.email(class="form-control", value=name_to_update.email) }}
+                <br />
+                {{ form.favorite_color.label(class="form-label") }}
+                {{ form.favorite_color(class="form-control", value=name_to_update.favorite_color) }}
 
+                <br />
                 {{ form.submit(class="btn btn-primary") }}
             </form>
         </div>
-
 {% endblock content %}

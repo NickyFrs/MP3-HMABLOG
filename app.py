@@ -18,6 +18,11 @@ app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///hopedb.db'  # Add database
 db = SQLAlchemy(app)
 migrate = Migrate(app, db)
 
+# FLASK LOGIN CONFIGURATION AND INITIALIZATION
+login_manager = LoginManager()
+login_manager.init_app(app)
+login_manager.login_view = 'login'  # where should the user be redirected if we are not logged in and a login is required
+
 
 # DATABASE MODEL
 class Users(db.Model, UserMixin):
@@ -79,6 +84,14 @@ class UserForm(FlaskForm):
     submit = SubmitField("Submit")
 
 
+# LOGIN FORM
+class LoginForm(FlaskForm):
+    #username = StringField("Username", validators=[DataRequired()])
+    email = StringField("Email", validators=[DataRequired(), Email()])
+    password = PasswordField('Password', validators=[DataRequired()])
+    submit = SubmitField("Login")
+
+
 # Crated form CLass for the forms
 class NameForm(FlaskForm):
     name = StringField("Name", validators=[DataRequired()])
@@ -94,6 +107,68 @@ def home():
 @app.route('/user/<name>')
 def user(name):
     return render_template('user.html', name=name)
+
+
+# LOGIN DECORATOR
+@login_manager.user_loader #load users when login
+def load_user(user_id):
+    return Users.query.get(int(user_id))
+
+
+# LOGIN PAGE
+@app.route('/login', methods=['POST', 'GET'])
+def login():
+    form = LoginForm()
+    if form.validate_on_submit():
+        user = Users.query.filter_by(email=form.email.data).first()
+        if user:
+            # Check the hash
+            if check_password_hash(user.password_hash, form.password.data):
+                login_user(user)
+                flash("Login Successful!!")
+                return redirect(url_for('dashboard'))
+            else:
+                flash("Wrong Password/Login - Please Try Again!")
+        else:
+            flash("That User Doesn't Exist! Try Again...")
+
+    return render_template('login.html', form=form)
+
+
+# LOGOUT PAGE
+@app.route('/logout', methods=['POST', 'GET'])
+@login_required
+def logout():
+    logout_user()
+    flash('You are now logged out!, Thank you for passing by!...')
+    return redirect(url_for('home'))
+
+
+# DASHBOARD PAGE
+@app.route("/dashboard", methods=['GET', 'POST'])
+@login_required
+def dashboard():
+    form = UserForm()
+    id = current_user.id
+    name_to_update = Users.query.get_or_404(id)
+
+    if request.method == 'POST':
+        name_to_update.name = request.form['name']
+        name_to_update.email = request.form['email']
+        name_to_update.favorite_color = request.form['favorite_color']
+        name_to_update.username = request.form['username']
+        try:
+            db.session.commit()
+            flash('User updated successfully')
+            return render_template('dashboard.html', form=form, name_to_update=name_to_update)
+        except:
+            flash('Error... Looks like there was a problem. Try again.')
+            return render_template('dashboard.html', form=form, name_to_update=name_to_update)
+
+    else:
+        return render_template('dashboard.html', form=form, name_to_update=name_to_update, id=id)
+
+    return render_template('dashboard.html')
 
 
 # INDIVIDUAL POST PAGE
@@ -174,8 +249,8 @@ def delete_post(id):
         # Return message
         flash('Blog post deleted successfully')
 
-        posts = Posts.query.order_by(Posts.date_posted) # Query DB again
-        return render_template('posts.html', posts=posts) # and redirect to the posts page
+        posts = Posts.query.order_by(Posts.date_posted)  # Query DB again
+        return render_template('posts.html', posts=posts)  # and redirect to the posts page
 
     except:
         # If error, show message
@@ -183,6 +258,7 @@ def delete_post(id):
         # an d redirect again
         posts = Posts.query.order_by(Posts.date_posted)  # Query DB again
         return render_template('posts.html', posts=posts)  # and redirect to the posts page
+
 
 # ADD USERS TO THE DATABASE
 @app.route('/user/add', methods=['GET', 'POST'])
@@ -192,8 +268,10 @@ def add_user():
     if form.validate_on_submit():
         user = Users.query.filter_by(email=form.email.data).first()
         if user is None:
-            hashed_pwd = generate_password_hash('form.password_hash.data', "sha256")
-            user = Users(username=form.username.data, name=form.name.data, email=form.email.data, favorite_color=form.favorite_color.data,
+            password = request.form.get('password_hash')
+            hashed_pwd = generate_password_hash(password, method="sha256")
+            user = Users(username=form.username.data, name=form.name.data, email=form.email.data,
+                         favorite_color=form.favorite_color.data,
                          password_hash=hashed_pwd)
             db.session.add(user)
             db.session.commit()
@@ -220,6 +298,7 @@ def update(id):
         name_to_update.name = request.form['name']
         name_to_update.email = request.form['email']
         name_to_update.favorite_color = request.form['favorite_color']
+        name_to_update.username = request.form['username']
         try:
             db.session.commit()
             flash('User updated successfully')

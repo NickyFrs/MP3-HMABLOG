@@ -1,8 +1,8 @@
 {% extends "base.html" %}
 
 {% block content %}
-        <h1>Edit Post</h1>
-        <br />
+    {% if current_user.is_authenticated %}
+        <h2>Edit Post</h2>
         <div class="shadow p-3 mb-5 bg-body rounded">
             <form action="#" method="POST" class="form-control">
                 {{ form.hidden_tag() }}
@@ -24,7 +24,17 @@
                 {{ form.submit(class="btn btn-primary") }}
                 <a href="{{ url_for('posts') }}" class="btn btn-dark">Back to Blog</a>
             </form>
-
         </div>
+    {% else %}
+        <h3>Must be logged in</h3>
+        <p>Sorry... you must be logged to access this feature.<br/>
+        Please log in or register to access.
+        </p>
+
+        <a href="{{ url_for('add_user') }}">Register here</a> or <a href="{{ url_for('login') }}">Login here</a>
+        <br />
+    {% endif %}
+
+
 
 {% endblock content %}
