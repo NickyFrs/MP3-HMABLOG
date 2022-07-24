@@ -1,13 +1,18 @@
+import os
+import uuid as uuid # created unique user id
 from flask import Flask, render_template, flash, request, redirect, url_for
 from flask_wtf import FlaskForm
 from werkzeug.security import generate_password_hash, check_password_hash
+from werkzeug.utils import secure_filename #to secure the name of the uploaded file
 from wtforms import StringField, SubmitField, PasswordField, TextAreaField, ValidationError
 from wtforms.validators import DataRequired, EqualTo, Email, length
+from flask_wtf.file import FileField
 from flask_ckeditor import CKEditorField, CKEditor
 from flask_sqlalchemy import SQLAlchemy
 from flask_migrate import Migrate
 from datetime import datetime
 from flask_login import current_user, UserMixin, LoginManager, login_user, login_required, logout_user
+
 
 app = Flask(__name__)
 
@@ -15,6 +20,10 @@ app = Flask(__name__)
 ckeditor = CKEditor(app)
 
 app.config['SECRET_KEY'] = 'b41bfb66739bd67d09342ad24f6a699deb7cbac892273d95'  # necessary for the forms
+
+# SET LOCAL FOLDER TO SAVE FILES
+UPLOAD_FOLDER = '/Users/New User/Desktop/MP3-HMABLOG/static/img/'
+app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 
 # DATABASE
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///hopedb.db'  # Add database
@@ -36,7 +45,8 @@ class Users(db.Model, UserMixin):
     email = db.Column(db.String(100), unique=True, nullable=False)
     favorite_color = db.Column(db.String(120))
     about_author = db.Column(db.Text(500), nullable=True)
-    data_added = db.Column(db.DateTime(), default=datetime.utcnow)
+    data_added = db.Column(db.DateTime, default=datetime.utcnow)
+    profile_pic = db.Column(db.String(), nullable=True)
 
     # Manny posts to an user
     posts = db.relationship("Posts", backref="blogger")
@@ -91,6 +101,7 @@ class UserForm(FlaskForm):
     password_hash = PasswordField('Password',
                                   validators=[DataRequired(), EqualTo('password_hash2', message='Password most match')])
     password_hash2 = PasswordField('Confirm Password', validators=[DataRequired()])
+    profile_pic = FileField('Profile Picture')
     submit = SubmitField("Submit")
 
 
@@ -210,8 +221,23 @@ def dashboard():
         name_to_update.favorite_color = request.form['favorite_color']
         name_to_update.about_author = request.form['about_author']
         name_to_update.username = request.form['username']
+        name_to_update.profile_pic = request.files['profile_pic'] # this upload the actual file
+
+        # variable to grab image name
+        pic_filename = secure_filename(name_to_update.profile_pic.filename)
+
+        # set UUID for file
+        pic_name = str(uuid.uuid1()) + "_" + pic_filename
+
+        # save the image to folder
+        saver = request.files['profile_pic']
+
+        # after save to folder change it ti string and save to db
+        name_to_update.profile_pic = pic_name
+
         try:
             db.session.commit()
+            saver.save(os.path.join(app.config['UPLOAD_FOLDER']), pic_name)
             flash('User updated successfully')
             return render_template('dashboard.html', form=form, name_to_update=name_to_update)
         except:

@@ -16,6 +16,7 @@
                 <strong>Favorite Color</strong>: {{ current_user. favorite_color}}<br/>
                 <strong>Date Joined</strong>: {{ current_user.data_added }}<br/>
                 <strong>About Author</strong>: {{ current_user.about_author }}<br/>
+                <strong>Profile Picture</strong>: {{ current_user.profile_pic }}<br/>
 
                 <br/><br/>
                 <a href="{{ url_for('update', id=current_user.id) }}" class="btn btn-warning">Update Profile</a>
@@ -33,7 +34,7 @@
     <h1>Update Profile...</h1>
         <br />
         <div class="shadow p-3 mb-5 bg-body rounded">
-            <form action="/dashboard" method="POST" class="form-control">
+            <form action="/dashboard" method="POST" class="form-control" enctype="multipart/form-data">
                 {{ form.hidden_tag() }}
 
                 {{ form.username.label(class="form-label") }}
@@ -49,9 +50,12 @@
                 {{ form.favorite_color.label(class="form-label") }}
                 {{ form.favorite_color(class="form-control", value=name_to_update.favorite_color) }}
                 <br />
-
                 {{ form.about_author.label(class="form-label") }}
                 <textarea name="about_author" class="form-control">{{ name_to_update.about_author }}</textarea>
+                <br />
+                {{ form.profile_pic.label(class="form-label") }}
+                {{ form.profile_pic(class="form-control", value=name_to_update.profile_pic) }}
+
                 <br />
                 {{ form.submit(class="btn btn-primary") }}
             </form>
