@@ -2,9 +2,8 @@
 
 {% block content %}
     {% if current_user.is_authenticated %}
-        <h1>hello {{ user.name.data|capitalize }}</h1>
-        <br /><br />
-        <h1>Add a Blog Post</h1>
+        <br />
+        <h1>Add a New Blog</h1>
         <br />
         <div class="shadow p-3 mb-5 bg-body rounded">
             <form action="#" method="POST" class="form-control">
@@ -12,9 +11,6 @@
 
                 {{ form.title.label(class="form-label") }}
                 {{ form.title(class="form-control") }}
-                <br />
-                {{ form.author.label(class="form-label") }}
-                {{ form.author(class="form-control") }}
                 <br />
                 {{ form.slug.label(class="form-label") }}
                 {{ form.slug(class="form-control") }}
@@ -24,6 +20,8 @@
                 <br />
                 {{ form.submit(class="btn btn-primary") }}
             </form>
+            {{ ckeditor.load() }}
+            {{ ckeditor.config(name='content') }}
         </div>
 
     {% else %}

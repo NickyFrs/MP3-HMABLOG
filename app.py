@@ -3,12 +3,16 @@ from flask_wtf import FlaskForm
 from werkzeug.security import generate_password_hash, check_password_hash
 from wtforms import StringField, SubmitField, PasswordField, TextAreaField, ValidationError
 from wtforms.validators import DataRequired, EqualTo, Email, length
+from flask_ckeditor import CKEditorField, CKEditor
 from flask_sqlalchemy import SQLAlchemy
 from flask_migrate import Migrate
 from datetime import datetime
 from flask_login import current_user, UserMixin, LoginManager, login_user, login_required, logout_user
 
 app = Flask(__name__)
+
+# ADD RICH TEXT EDITOR - CKEditor
+ckeditor = CKEditor(app)
 
 app.config['SECRET_KEY'] = 'b41bfb66739bd67d09342ad24f6a699deb7cbac892273d95'  # necessary for the forms
 
@@ -24,7 +28,7 @@ login_manager.init_app(app)
 login_manager.login_view = 'login'  # where should the user be redirected if we are not logged in and a login is required
 
 
-# DATABASE MODEL
+# USERS DATABASE MODEL
 class Users(db.Model, UserMixin):
     id = db.Column(db.Integer, primary_key=True)
     username = db.Column(db.String(20), unique=True, nullable=False)
@@ -32,6 +36,9 @@ class Users(db.Model, UserMixin):
     email = db.Column(db.String(100), unique=True, nullable=False)
     favorite_color = db.Column(db.String(120))
     data_added = db.Column(db.DateTime(), default=datetime.utcnow)
+
+    # Manny posts to an user
+    posts = db.relationship("Posts", backref="blogger")
 
     # PASSWORD HASHING
     password_hash = db.Column(db.String(128))
@@ -58,16 +65,17 @@ class Posts(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     title = db.Column(db.String(255))
     content = db.Column(db.Text)
-    author = db.Column(db.String(255))
     date_posted = db.Column(db.DateTime, default=datetime.utcnow)
     slug = db.Column(db.String(255))
+
+    # Foreing Key
+    blogger_id = db.Column(db.Integer, db.ForeignKey('users.id'))
 
 
 # POST FORM
 class PostForm(FlaskForm):
     title = StringField("Title", validators=[DataRequired()])
-    content = TextAreaField("Content", validators=[DataRequired()])
-    author = StringField("Author", validators=[DataRequired()])
+    content = CKEditorField("Content", validators=[DataRequired()])
     slug = StringField("Slug", validators=[DataRequired()])
     submit = SubmitField('Post')
 
@@ -84,12 +92,20 @@ class UserForm(FlaskForm):
     submit = SubmitField("Submit")
 
 
+
+
 # LOGIN FORM
 class LoginForm(FlaskForm):
     #username = StringField("Username", validators=[DataRequired()])
     email = StringField("Email", validators=[DataRequired(), Email()])
     password = PasswordField('Password', validators=[DataRequired()])
     submit = SubmitField("Login")
+
+
+# SEARCH FORM
+# class SearchForm(FlaskForm):
+#     search = StringField("Search", validators=[DataRequired()])
+#     submit = SubmitField("Submit")
 
 
 # Crated form CLass for the forms
@@ -109,6 +125,29 @@ def user(name):
     return render_template('user.html', name=name)
 
 
+# ADMIN PAGE
+
+# Pass variable to an extended file
+#@app.context_processor  # context_processor will pass a variable for any {% extends 'file.html' %}
+#def base(): # this can be called anything but base as the search is inside the base file
+    #form = SearchForm()
+    #return dict(form=form) #dict for dictionary
+
+
+# SEARCH FUNCTION
+# @app.route('/search', methods=['POST'])
+# def search():
+#     form = SearchForm()
+#     user_search = Posts.query
+#     if form.validate_on_submit():
+#         #get data from the search form
+#         post.searched = form.search.data
+#         # qquery the DB
+#         search_found = user_search.filter(Posts.content.like('%' + post.searched + '%'))
+#         search_found = user_search.order_by(Posts.title).all()
+#
+#         return render_template('search.html', form=form, searched=post.searched, search_found=search_found)
+
 # LOGIN DECORATOR
 @login_manager.user_loader #load users when login
 def load_user(user_id):
@@ -125,22 +164,22 @@ def login():
             # Check the hash
             if check_password_hash(user.password_hash, form.password.data):
                 login_user(user)
-                flash("Login Successful!!")
+                flash("Login Successful!!", "success")
                 return redirect(url_for('dashboard'))
             else:
-                flash("Wrong Password/Login - Please Try Again!")
+                flash("Wrong Password/Login - Please Try Again!", 'warning')
         else:
             flash("That User Doesn't Exist! Try Again...")
 
     return render_template('login.html', form=form)
 
 
-# LOGOUT PAGE
+# LOGOUT FUNCTION PAGE
 @app.route('/logout', methods=['POST', 'GET'])
 @login_required
 def logout():
     logout_user()
-    flash('You are now logged out!, Thank you for passing by!...')
+    flash('You are now logged out!, Thank you for passing by, see you soon!... :-)', 'success')
     return redirect(url_for('home'))
 
 
@@ -189,30 +228,37 @@ def posts():
 
 # TO EDIT A POST
 @app.route('/posts/edit/<int:id>', methods=['GET', 'POST'])  # INT:ID WILL LET UD EDIT AND INDIVIDUAL POST
+@login_required
 def edit_post(id):
-    # grab the posts from the database
-    post = Posts.query.get_or_404(id)
-    form = PostForm()
 
-    if form.validate_on_submit():
-        post.title = form.title.data
-        post.content = form.content.data
-        post.author = form.author.data
-        post.slug = form.slug.data
+        # grab the posts from the database
+        post = Posts.query.get_or_404(id)
+        form = PostForm()
 
-        # Update post on the database
-        db.session.add(post)
-        db.session.commit()
+        if form.validate_on_submit():
+            post.title = form.title.data
+            post.content = form.content.data
+            post.slug = form.slug.data
 
-        flash('Post has be updated successfully')
-        return redirect(url_for('post', id=post.id))
+            # Update post on the database
+            db.session.add(post)
+            db.session.commit()
 
-    form.title.data = post.title
-    form.content.data = post.content
-    form.author.data = post.author
-    form.slug.data = post.slug
+            flash('Post has be updated successfully')
+            return redirect(url_for('post', id=post.id))
 
-    return render_template('edit_post.html', form=form)
+        if current_user.id == post.blogger_id:
+
+            form.title.data = post.title
+            form.content.data = post.content
+            form.slug.data = post.slug
+
+            return render_template('edit_post.html', form=form)
+
+        else:
+            flash(' You are not authorize to edit this post!')
+            posts = Posts.query.order_by(Posts.date_posted)  # Query DB again
+            return render_template('posts.html', posts=posts)  # and redirect to the posts page
 
 
 # ADD POSTS TO THE DATABASE
@@ -222,10 +268,10 @@ def add_post():
     form = PostForm()
 
     if form.validate_on_submit():
-        post = Posts(title=form.title.data, content=form.content.data, author=form.author.data, slug=form.slug.data)
+        blogger = current_user.id
+        post = Posts(title=form.title.data, content=form.content.data, blogger_id=blogger, slug=form.slug.data)
         form.title.data = ''
         form.content.data = ''
-        form.author.data = ''
         form.slug.data = ''
 
         # add post tho the database
@@ -239,28 +285,36 @@ def add_post():
 
 # DELETE POST FROM THE DATABASE
 @app.route('/posts/delete/<int:id>')  # INT:ID WILL LET UD EDIT AND INDIVIDUAL POST
+@login_required
 def delete_post(id):
     post_to_delete = Posts.query.get_or_404(id)
-    try:
-        # Delete post from the database
-        db.session.delete(post_to_delete)
-        db.session.commit()
+    id = current_user.id
 
-        # Return message
-        flash('Blog post deleted successfully')
+    if id == post_to_delete.blogger.id: #check if the post to delete was created by the user
+        try:
+            # Delete post from the database
+            db.session.delete(post_to_delete)
+            db.session.commit()
 
-        posts = Posts.query.order_by(Posts.date_posted)  # Query DB again
-        return render_template('posts.html', posts=posts)  # and redirect to the posts page
+            # Return message
+            flash('Blog post deleted successfully')
 
-    except:
-        # If error, show message
-        flash('There was a problem deleting the post')
-        # an d redirect again
-        posts = Posts.query.order_by(Posts.date_posted)  # Query DB again
-        return render_template('posts.html', posts=posts)  # and redirect to the posts page
+            posts = Posts.query.order_by(Posts.date_posted)  # Query DB again
+            return render_template('posts.html', posts=posts)  # and redirect to the posts page
 
+        except:
+            # If error, show message
+            flash('There was a problem deleting the post')
+            # an d redirect again
+            posts = Posts.query.order_by(Posts.date_posted)  # Query DB again
+            return render_template('posts.html', posts=posts)  # and redirect to the posts page
 
-# ADD USERS TO THE DATABASE
+    else:
+        flash(' You are not authorize to delete the post!')
+        posts = Posts.query.order_by(Posts.date_posted)
+        return render_template('posts.html', posts=posts)
+
+    # ADD USERS TO THE DATABASE
 @app.route('/user/add', methods=['GET', 'POST'])
 def add_user():
     name = None
@@ -290,6 +344,7 @@ def add_user():
 
 # UPDATE DATABASE RECORDS
 @app.route('/update/<int:id>', methods=['GET', 'POST'])
+@login_required
 def update(id):
     form = UserForm()
     name_to_update = Users.query.get_or_404(id)

@@ -25,18 +25,33 @@
 <body>
     <!-- MESSAGES NOTIFICATIONS -->
     <section>
-        {% for message in get_flashed_messages() %}
-            <div class="alert alert-warning alert-dismissible fade show" role="alert">
-              <strong>{{ message }}</strong>
-              <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-            </div>
-        {% endfor %}
+        {% with messages = get_flashed_messages(with_categories=true) %}
+          {% if messages %}
+              {% for category, message in messages %}
+                  <div class="alert alert-{{ category }} alert-dismissible fade show" role="alert">
+                      <strong>{{ message }}</strong>
+                      <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                  </div>
+              {% endfor %}
+          {% endif %}
+        {% endwith %}
     </section>
 
     <main>
-        {% block content %}
-
-        {% endblock content %}
+        <div class="container mt-5">
+            <div class="row">
+                <!--  -->
+                <div class="col-lg-8">
+                    {% block content %}
+                        {% include "home.html" %}
+                    {% endblock content %}
+                </div>
+                <!--  -->
+                <div class="col-lg-4">
+                    {% include "sidebar.html" %}
+                </div>
+            </div>
+        </div>
     </main>
 
 
