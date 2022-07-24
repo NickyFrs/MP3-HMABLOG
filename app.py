@@ -35,6 +35,7 @@ class Users(db.Model, UserMixin):
     name = db.Column(db.String(50), nullable=False)
     email = db.Column(db.String(100), unique=True, nullable=False)
     favorite_color = db.Column(db.String(120))
+    about_author = db.Column(db.Text(500), nullable=True)
     data_added = db.Column(db.DateTime(), default=datetime.utcnow)
 
     # Manny posts to an user
@@ -86,6 +87,7 @@ class UserForm(FlaskForm):
     name = StringField("Name", validators=[DataRequired()])
     email = StringField("Email", validators=[DataRequired(), Email()])
     favorite_color = StringField("Favorite Color")
+    about_author = TextAreaField("About Author")
     password_hash = PasswordField('Password',
                                   validators=[DataRequired(), EqualTo('password_hash2', message='Password most match')])
     password_hash2 = PasswordField('Confirm Password', validators=[DataRequired()])
@@ -126,6 +128,17 @@ def user(name):
 
 
 # ADMIN PAGE
+@app.route('/admin')
+@login_required
+def admin():
+    id = current_user.id
+
+    if id == 1:
+        return render_template('admin.html')
+    else:
+        flash('Sorry only administrators have access to this page', 'warning')
+        return redirect(url_for('dashboard'))
+
 
 # Pass variable to an extended file
 #@app.context_processor  # context_processor will pass a variable for any {% extends 'file.html' %}
@@ -195,6 +208,7 @@ def dashboard():
         name_to_update.name = request.form['name']
         name_to_update.email = request.form['email']
         name_to_update.favorite_color = request.form['favorite_color']
+        name_to_update.about_author = request.form['about_author']
         name_to_update.username = request.form['username']
         try:
             db.session.commit()
@@ -256,7 +270,7 @@ def edit_post(id):
             return render_template('edit_post.html', form=form)
 
         else:
-            flash(' You are not authorize to edit this post!')
+            flash(' You are not authorize to edit this post!', 'danger')
             posts = Posts.query.order_by(Posts.date_posted)  # Query DB again
             return render_template('posts.html', posts=posts)  # and redirect to the posts page
 
@@ -336,7 +350,7 @@ def add_user():
         form.favorite_color.data = ''
         form.password_hash = ''
 
-        flash('User Added Successfully')
+        flash('User Added Successfully', 'success')
 
     our_users = Users.query.order_by(Users.data_added)
     return render_template('add_user.html', form=form, name=name, our_users=our_users)
@@ -353,11 +367,12 @@ def update(id):
         name_to_update.name = request.form['name']
         name_to_update.email = request.form['email']
         name_to_update.favorite_color = request.form['favorite_color']
+        name_to_update.about_author = request.form['about_author']
         name_to_update.username = request.form['username']
         try:
             db.session.commit()
-            flash('User updated successfully')
-            return render_template('update.html', form=form, name_to_update=name_to_update)
+            flash('User updated successfully', 'success')
+            return render_template('dashboard.html', form=form, name_to_update=name_to_update)
         except:
             flash('Error... Looks like there was a problem. Try again.')
             return render_template('update.html', form=form, name_to_update=name_to_update)

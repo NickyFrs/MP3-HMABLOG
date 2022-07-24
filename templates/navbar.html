@@ -23,8 +23,14 @@
 
                 {% if current_user.is_authenticated %}
                     <li class="nav-item"><a class="nav-link" href="{{ url_for('dashboard') }}">Dashboard</a></li>
+
+                    {% if current_user.id == 1 %}
+                        <li class="nav-item"><a class="nav-link" href="{{ url_for('admin') }}">Admin</a></li>
+                    {% endif %}
+
                     <li class="nav-item"><a class="nav-link" href="{{ url_for('add_post') }}">Add Post</a></li>
                     <li class="nav-item"><a class="nav-link" href="{{ url_for('logout') }}">Logout</a>
+
                 {% else %}
                     </li><li class="nav-item"><a class="nav-link" href="{{ url_for('add_user') }}">Register</a></li>
                     <li class="nav-item"><a class="nav-link" href="{{ url_for('login') }}">Login</a>

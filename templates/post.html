@@ -7,6 +7,10 @@
         <small>by: {{ post.blogger.name }} | on: {{ post.date_posted }}</small><br/>
         <small></small><br/>
         {{ post.content|safe }}<br/><br/>
+    {% if post.blogger.about_author %}
+        About the blogger: {{ post.blogger.about_author }}
+    {% endif %}
+    <br/><br/>
         <a href="{{ url_for('posts') }}" class="btn btn-dark">Back to Blog</a>
 
     {% if post.blogger_id == current_user.id %}
