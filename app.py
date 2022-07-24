@@ -32,6 +32,16 @@ app.config['SQLALCHEMY_DATABASE_URI'] = 'postgres://zvchjsqllgphgm:db745bad88a33
 db = SQLAlchemy(app)
 migrate = Migrate(app, db)
 
+
+if os.environ.get("DEVELOPMENT") == "True":
+    app.config["SQLALCHEMY_DATABASE_URI"] = os.environ.get("DB_URL")
+else:
+    uri = os.environ.get("DATABASE_URL")
+    if uri.startswith("postgres://"):
+        uri = uri.replace("postgres://", "postgresql://", 1)
+    app.config["SQLALCHEMY_DATABASE_URI"] = uri  # Heroku
+
+
 # FLASK LOGIN CONFIGURATION AND INITIALIZATION
 login_manager = LoginManager()
 login_manager.init_app(app)
