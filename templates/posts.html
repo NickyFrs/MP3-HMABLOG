@@ -60,7 +60,7 @@
                 {% if posts.page == page_num %}
                     <a class="btn btn-success mb-4" href="{{ url_for('posts', page=page_num) }}">{{ page_num }}</a>
                 {% else %}
-                    <a class="btn btn-outline-success mb-4" href="{{ url_for(page=page_num) }}">{{ page_num }}</a>
+                    <a class="btn btn-outline-success mb-4" href="{{ url_for('posts', page=page_num) }}">{{ page_num }}</a>
                 {% endif %}
             {% else %}
                 ...
