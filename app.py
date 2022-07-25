@@ -226,27 +226,35 @@ def dashboard():
         name_to_update.favorite_color = request.form['favorite_color']
         name_to_update.about_author = request.form['about_author']
         name_to_update.username = request.form['username']
-        name_to_update.profile_pic = request.files['profile_pic'] # this upload the actual file
 
-        # variable to grab image name
-        pic_filename = secure_filename(name_to_update.profile_pic.filename)
+        # check for profile pic
+        if request.files['profile_pic']:
+            name_to_update.profile_pic = request.files['profile_pic']  # this upload the actual file
 
-        # set UUID for file
-        pic_name = str(uuid.uuid1()) + "_" + pic_filename
+            # variable to grab image name
+            pic_filename = secure_filename(name_to_update.profile_pic.filename)
 
-        # save the image to folder
-        saver = request.files['profile_pic']
+            # set UUID for file
+            pic_name = str(uuid.uuid1()) + "_" + pic_filename
 
-        # after save to folder change it ti string and save to db
-        name_to_update.profile_pic = pic_name
+            # save the image to folder
+            saver = request.files['profile_pic']
 
-        try:
+            # after save to folder change it ti string and save to db
+            name_to_update.profile_pic = pic_name
+
+            try:
+                db.session.commit()
+                saver.save(os.path.join(app.config['UPLOAD_FOLDER'], pic_name))
+                flash('User updated successfully', 'success')
+                return render_template('dashboard.html', form=form, name_to_update=name_to_update)
+            except:
+                flash('Error... Looks like there was a problem. Try again.', 'warning')
+                return render_template('dashboard.html', form=form, name_to_update=name_to_update)
+
+        else:
             db.session.commit()
-            saver.save(os.path.join(app.config['UPLOAD_FOLDER']), pic_name)
-            flash('User updated successfully')
-            return render_template('dashboard.html', form=form, name_to_update=name_to_update)
-        except:
-            flash('Error... Looks like there was a problem. Try again.')
+            flash('User updated successfully', 'success')
             return render_template('dashboard.html', form=form, name_to_update=name_to_update)
 
     else:
