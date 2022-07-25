@@ -138,9 +138,24 @@ def home():
     return render_template('home.html', first_name=first_name)
 
 
-@app.route('/user/<name>')
+@app.route('/user_posts/<name>')
 def user(name):
     return render_template('user.html', name=name)
+
+
+# USER POSTS PAGE
+@app.route('/user/<name>')
+def user_posts(name):
+    # grab the page we want do a query parameter, 1 is the default page
+    page = request.args.get('page', 1, type=int)
+
+    # Query the db for the user
+    user = Users.query.filter_by(name=name).first_or_404()
+
+    # grab all the posts from the database and paginate those posts
+    user_posts = Posts.query.filter_by(blogger=user).order_by(Posts.date_posted).paginate(page=page, per_page=2)
+    return render_template('user_posts.html', name=name, user_posts=user_posts)
+
 
 
 # ADMIN PAGE

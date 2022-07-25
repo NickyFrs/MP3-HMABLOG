@@ -1,17 +1,15 @@
 {% extends "base.html" %}
 
 {% block content %}
-    <h1>Blog Posts...</h1>
+    <h1>Posts By: {{ name }}</h1>
     <br/>
-    {% for post in posts.items %}
+    {% for post in user_posts.items %}
         <h2><a href="{{ url_for('post', id=post.id) }}">{{ post.title }}</a></h2>
 
-        <small>
-            by: <a href="{{ url_for('user_posts', name=post.blogger.name) }}">{{ post.blogger.name }}</a> |
-            on: {{ post.date_posted }}</small><br/>
+        <small>by: {{ post.blogger.name }} | on: {{ post.date_posted }}</small><br/>
 
-        {{ post.content|safe }}
-        <br/>
+        {{ post.content|safe }}<br/>
+
 
         <div class="card mb-3">
             <div class="row no-gutters">
@@ -40,6 +38,7 @@
         </div>
 
         <br/><br/>
+        <a href="{{ url_for('posts') }}" class="btn btn-dark">Back to Blog</a>
         <a href="{{ url_for('post', id=post.id) }}" class="btn btn-dark">View post</a>
 
         {% if post.blogger_id == current_user.id %}
@@ -54,11 +53,11 @@
         <small>Pages:
         <!-- Pagination -->
         <!-- for loop to create the pages -->
-        {% for page_num in posts.iter_pages() %}
+        {% for page_num in user_posts.iter_pages() %}
             <!-- conditional to show different color buttons form the current page we are on and the others -->
             {% if page_num %}
-                {% if posts.page == page_num %}
-                    <a class="btn btn-success mb-4" href="{{ url_for('posts', page=page_num) }}">{{ page_num }}</a>
+                {% if user_posts.page == page_num %}
+                    <a class="btn btn-success mb-4" href="{{ url_for('user_posts', name=name, page=page_num) }}">{{ page_num }}</a>
                 {% else %}
                     <a class="btn btn-outline-success mb-4" href="{{ url_for(page=page_num) }}">{{ page_num }}</a>
                 {% endif %}

@@ -30,8 +30,6 @@ F
 migrations/alembic.ini,6\3\6363203731e53d99f7f2e253f95ee1f8aa0cec00
 G
 templates/add_user.html,a\a\aa7e5e117affac4f5dda62cbf22167326243695e
-C
-templates/user.html,5\3\53630e1934f2a3a58f1ce92f49404ad1e7eb6ec9
 G
 templates/add_post.html,e\d\ede77b19b9e221bc79d98d4e77516df78c50c7c0
 H
