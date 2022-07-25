@@ -54,7 +54,7 @@
         <small>Pages:
         <!-- Pagination -->
         <!-- for loop to create the pages -->
-        {% for page_num in posts.iter_pages() %}
+        {% for page_num in posts.iter_pages(left_edge=1, right_edge=1, left_current=2, right_current=1) %}
             <!-- conditional to show different color buttons form the current page we are on and the others -->
             {% if page_num %}
                 {% if posts.page == page_num %}
