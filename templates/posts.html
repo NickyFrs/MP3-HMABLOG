@@ -3,7 +3,7 @@
 {% block content %}
     <h1>Blog Posts...</h1>
     <br/>
-    {% for post in posts %}
+    {% for post in posts.items %}
         <h2><a href="{{ url_for('post', id=post.id) }}">{{ post.title }}</a></h2>
 
         <small>by: {{ post.blogger.name }} | on: {{ post.date_posted }}</small><br/>
@@ -47,4 +47,23 @@
             <hr>
         {% endif %}
     {% endfor %}
+    <br/><br/>
+    <div class="row">
+        <small>Pages:
+        <!-- Pagination -->
+        <!-- for loop to create the pages -->
+        {% for page_num in posts.iter_pages() %}
+            <!-- conditional to show different color buttons form the current page we are on and the others -->
+            {% if page_num %}
+                {% if posts.page == page_num %}
+                    <a class="btn btn-success mb-4" href="{{ url_for('posts', page=page_num) }}">{{ page_num }}</a>
+                {% else %}
+                    <a class="btn btn-outline-success mb-4" href="{{ url_for(page=page_num) }}">{{ page_num }}</a>
+                {% endif %}
+            {% else %}
+
+            {% endif %}
+        {% endfor %}
+        </small>
+    </div>
 {% endblock content %}

@@ -274,8 +274,11 @@ def post(id):
 # ALL POSTS PAGE
 @app.route('/posts')
 def posts():
-    # grab all the posts from the database
+    # grab the page we want do a query parameter, 1 is the default page
+    page = request.args.get('page', 1, type=int)
+    # grab all the posts from the database and paginate those posts
     posts = Posts.query.order_by(Posts.date_posted)
+    posts = Posts.query.paginate(page=page, per_page=2)
     return render_template('posts.html', posts=posts)
 
 
