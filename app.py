@@ -25,21 +25,15 @@ app.config['SECRET_KEY'] = 'b41bfb66739bd67d09342ad24f6a699deb7cbac892273d95'  #
 UPLOAD_FOLDER = '/Users/New User/Desktop/MP3-HMABLOG/static/img/'
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 
+
 # DATABASE
-#app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///hopedb.db'  # Add database
-app.config['SQLALCHEMY_DATABASE_URI'] = 'postgres://zvchjsqllgphgm:db745bad88a33421152e2ede1cb7ab058557eafd958aeed4490fa0d0a4a566df@ec2-3-219-52-220.compute-1.amazonaws.com:5432/djp2i5ggn6q28'  # Add database
+app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///hopedb.db'  # Add database
+#app.config['SQLALCHEMY_DATABASE_URI'] = 'postgres://zvchjsqllgphgm:db745bad88a33421152e2ede1cb7ab058557eafd958aeed4490fa0d0a4a566df@ec2-3-219-52-220.compute-1.amazonaws.com:5432/djp2i5ggn6q28'  # Add database
+#app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://postgres:Cherlina10@localhost/hopeblog-db'
+
 
 db = SQLAlchemy(app)
 migrate = Migrate(app, db)
-
-
-if os.environ.get("DEVELOPMENT") == "True":
-    app.config["SQLALCHEMY_DATABASE_URI"] = os.environ.get("DB_URL")
-else:
-    uri = os.environ.get("DATABASE_URL")
-    if uri.startswith("postgres://"):
-        uri = uri.replace("postgres://", "postgresql://", 1)
-    app.config["SQLALCHEMY_DATABASE_URI"] = uri  # Heroku
 
 
 # FLASK LOGIN CONFIGURATION AND INITIALIZATION
@@ -420,24 +414,27 @@ def update(id):
 
 # DELETE USER FROM DATABASE RECORDS
 @app.route('/delete/<int:id>')
+@login_required
 def delete(id):
-    user_to_delete = Users.query.get_or_404(id)
-    name = None
-    form = UserForm()
+    if id == current_user.id:
+        user_to_delete = Users.query.get_or_404(id)
+        name = None
+        form = UserForm()
 
-    try:
-        db.session.delete(user_to_delete)
-        db.session.commit()
-        flash('User deleted successfully!')
+        try:
+            db.session.delete(user_to_delete)
+            db.session.commit()
+            flash('User deleted successfully!', 'success')
 
-        our_users = Users.query.order_by(Users.data_added)
-        return render_template('add_user.html', form=form, name=name, our_users=our_users)
+            our_users = Users.query.order_by(Users.data_added)
+            return render_template('add_user.html', form=form, name=name, our_users=our_users)
 
-    except:
-        flash('There was a problem deleting user, try again')
-        return render_template('add_user.html', form=form, name=name, our_users=our_users)
-
-    return render_template('home.html', first_name=first_name)
+        except:
+            flash('There was a problem deleting user, try again', 'warning')
+            return render_template('add_user.html', form=form, name=name, our_users=our_users)
+    else:
+        flash("Sorry you can't delete that user!", "danger")
+        return redirect(url_for('dashboard'))
 
 
 # NAME PAGE
