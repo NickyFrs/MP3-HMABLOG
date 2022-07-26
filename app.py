@@ -259,7 +259,7 @@ def login():
             else:
                 flash("Wrong Password/Login - Please Try Again!", 'warning')
         else:
-            flash("That User Doesn't Exist! Try Again...")
+            flash("That User Doesn't Exist! Try Again...", 'warning')
 
     return render_template('login.html', form=form)
 
