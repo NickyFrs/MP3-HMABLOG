@@ -22,8 +22,6 @@ C
 templates/name.html,2\1\21f5b39dbf2b3b19e912caeeb6a59a9a663c0a8a
 C
 templates/home.html,8\6\86f3a00c4de0ad1280042b4c75ce3672e5141a0f
-@
-requirements.txt,1\9\19359a61ae2446b51b549167b014da2fcf265768
 F
 migrations/alembic.ini,6\3\6363203731e53d99f7f2e253f95ee1f8aa0cec00
 G
@@ -40,3 +38,11 @@ y
 Imigrations/versions/7aa41e035773_added_a_new_about_author_col_to_user_.py,4\6\4601d9946c73ea13fbbc0cd0de0a9727f6331f30
 8
 Procfile,b\c\bc3c68e880d1a01632bce79f69dd1387c7ba9c54
+F
+templates/sidebar.html,f\c\fc5076aef05296bf5873515cbf4523c73347b0db
+9
+	config.py,1\a\1a1b9769344cb239f2e540e1e6ee1efa2d3034ea
+D
+templates/admin.html,a\0\a02f370c569f95c7384578e9a07175aef619ad13
+C
+templates/base.html,d\a\da7c237b85a69c00a9ab8c189bf63e22070fcac3

@@ -1,5 +1,8 @@
 import os
 import uuid as uuid  # created unique user id
+import jwt
+
+from time import time
 from flask import Flask, render_template, flash, request, redirect, url_for
 from flask_wtf import FlaskForm
 from werkzeug.security import generate_password_hash, check_password_hash
@@ -12,7 +15,7 @@ from flask_sqlalchemy import SQLAlchemy
 from flask_migrate import Migrate
 from datetime import datetime
 from flask_login import current_user, UserMixin, LoginManager, login_user, login_required, logout_user
-from itsdangerous import TimedJSONWebSignatureSerializer as Serializer # for creating a timed token for email recovery
+from itsdangerous import TimedJSONWebSignatureSerializer as Serializer  # for creating a timed token for email recovery
 from flask_mail import Mail, Message
 
 app = Flask(__name__)
@@ -39,13 +42,25 @@ login_manager.init_app(app)
 login_manager.login_view = 'login'  # where should the user be redirected if we are not logged in and a login is required
 
 # TELL APP HOW TO SEND EMAIL
-app.config['MAIL_SERVER'] = 'smtp.google.mail.com'
-app.config['MAIL_PORT'] = 587
-app.config['MAIL_USE_TLS'] = True
+app.config['MAIL_SERVER'] = 'smtp.gmail.com'  # your mail server
+app.config['MAIL_PORT'] = 587  # number of port your email server sending emails
+app.config['MAIL_USE_TLS'] = True  # security services from the email services. Encryption
+app.config['MAIL_USE_SSL'] = False  # security services from the email services. . Encryption
 app.config['MAIL_USERNAME'] = os.environ.get('GM_USR')
 app.config['MAIL_PASSWORD'] = os.environ.get('GM_PWD')
+app.config['MAIL_DEBUG'] = True
+app.config[
+    'MAIL_DEFAULT_SENDER'] = None  # ('name', 'email') # to set the from email address by default if not specified
+app.config['MAIL_MAX_EMAILS'] = None  # limit  the amount of emails send from one request.
+app.config['MAIL_ASCII_ATTACHMENTS'] = False  # converts the file name to ASCII
+app.config['MAIL_SUPPRESS_SEND'] = False  # similar to debug. testing purposes
+app.config['TESTING'] = True  # prevent from sending email while testing
 
 mail = Mail(app)
+
+
+# mail = Mail()
+# mail.init_app(app)
 
 # USERS DATABASE MODEL
 class Users(db.Model, UserMixin):
@@ -80,19 +95,21 @@ class Users(db.Model, UserMixin):
     def __repr__(self):
         return '<Name %r>' % self.name
 
+    # token generation and verification functions methods for user password recovery
     # METHOD TO CREATE TOKEN FOR EMAIL RECOVERY
-    def get_reset_token(self, expires_sec=1800):
-        s = Serializer(app.config['SECRET_KEY'], expires_sec)
-        return s.dump({'users.id': self.id}).decode('utf8')
+    def get_reset_password_token(self, expires_in=1800):
+        return jwt.encode(
+            {'reset_password': self.id, 'exp': time() + expires_in},
+            app.config['SECRET_KEY'], algorithm='HS256')
 
     # METHOD TO VERIFY TOKEN FOR EMAIL RECOVERY
-    @staticmethod  # this tels python not expect the self argument just the token(in this case) argument
-    def verify_reset_token(token):
-        s = Serializer(app.config['SECRET_KEY'])
+    @staticmethod  # this tels' python not expect the self argument just the token(in this case) argument
+    def verify_reset_password_token(token):
         try:
-            user_id = s.loads(token)['user.id']
+            user_id = jwt.decode(token, app.config['SECRET_KEY'],
+                                 algorithms=['HS256'])['reset_password']
         except:
-            return None
+            return
         return Users.query.get(user_id)
 
 
@@ -274,18 +291,57 @@ def logout():
 
 
 # FUNCTION TO SEND EMAILS
-def send_rest_email(user):
-    token = user.get_reset_token()
-    msg = Message('Password Reset Request',
-                  sender='noreply@gmail.com',
-                  recipient = [user.email])
+def send_password_reset_email(user):
+    token = user.get_reset_password_token()
+    msg = Message(subject='Password Reset Request',
+                  sender=('HMA-Blog', 'noreply@gmail.com'),
+                  recipients=[user.email])
 
-    msg.body = f''' To reset your password, please go to this link:
-{url_for('reset_pwd_token', token=token, _external=True)} # _external=True is to get an absolute url not a relative.
+    msg.body = f''' 
+Dear {{ user.username }},
 
-If you did not make this request then simply ignore this email and no change will be made.
+To reset your password click on the following link:
+
+{ url_for('reset_pwd_token', token=token, _external=True) }
+
+If you have not requested a password reset simply ignore this message.
+
+Sincerely,
+
+The HMA Blog Team
 '''
+    msg.html = f'''
+<p>Dear {{ user.username }},</p>
+<p>To reset your password 
+<a href="{{ url_for('reset_password', token=token, _external=True) }}">click here</a>.
+</p>
+<p>Alternatively, you can paste the following link in your browser's address bar:</p>
+<p>{{ url_for('reset_password', token=token, _external=True) }}</p>
+<p>If you have not requested a password reset simply ignore this message.</p>
+<p>Sincerely,</p>
+<p>The HMA Blog Team</p>
+'''
+
+    # mail.add_recipient('')
+    # with app.open_resource('name of file') as file:
+    # msg.attach('filename', 'MIME type of file i.e image/jpeg', file.read())
+    # PARAMETER WE CAN HAVE IN THE MESSAGE FUNCTION
+    # msg = Message(
+    #     subject = ' ',
+    #     recipients = [],
+    #     body = '',
+    #     html = '',
+    #     sender = '',
+    #     cc = [],
+    #     bcc = [],
+    #     reply_to = [],
+    #     date = 'date',
+    #     charset = ''
+    # )
+
     mail.send(msg)
+
+    return flash('Message sent', 'info')
 
 
 # RESET PWD REQUEST PAGE
@@ -296,22 +352,27 @@ def reset_request():
     form = RequestResetForm()
     if form.validate_on_submit():
         user = Users.query.filter_by(email=form.email.data).first()
-        send_rest_email(user)
-        flash('Please check your email to reset your password', 'info')
-        return redirect(url_for('login'))
+        if user:
+            send_password_reset_email(user)
+            flash('Please check your email for the instructions to reset your password', 'info')
+            return redirect(url_for('login'))
+        else:
+            flash('This email is not register, please sign up!', 'danger')
+            return redirect(url_for('add_user'))
+
     return render_template('reset_request.html', form=form, title='Reset Password')
 
 
 # RESET PWD PAGE
 @app.route('/reset_pwd/<token>', methods=['GET', 'POST'])
-def reset_pwd_token():
+def reset_pwd_token(token):
     if current_user.is_authenticated:
         return redirect(url_for('dashboard'))
 
-    #check for the reset token
-    user = Users.verify_reset_token(token)
+    # check for the reset token
+    user = Users.verify_reset_password_token(token)
 
-    if user is None:
+    if not user:
         flash('That is an invalid or expired token', 'warning')
         return redirect(url_for('reset_request'))
     form = ResetPasswordForm()
@@ -322,7 +383,6 @@ def reset_pwd_token():
         db.session.commit()
         flash("Your password has been reset successfully!", "success")
     return render_template('reset_pwd_token.html', form=form, title='Reset Password')
-
 
 
 # DASHBOARD PAGE
@@ -447,7 +507,7 @@ def add_post():
         db.session.commit()
 
         # Return message
-        flash('Blog post added successfully')
+        flash('Blog post added successfully', 'success')
     return render_template('add_post.html', form=form, name=name)
 
 
@@ -465,20 +525,20 @@ def delete_post(id):
             db.session.commit()
 
             # Return message
-            flash('Blog post deleted successfully')
+            flash('Blog post deleted successfully', 'success')
 
             posts = Posts.query.order_by(Posts.date_posted)  # Query DB again
             return render_template('posts.html', posts=posts)  # and redirect to the posts page
 
         except:
             # If error, show message
-            flash('There was a problem deleting the post')
+            flash('There was a problem deleting the post', 'warning')
             # an d redirect again
             posts = Posts.query.order_by(Posts.date_posted)  # Query DB again
             return render_template('posts.html', posts=posts)  # and redirect to the posts page
 
     else:
-        flash(' You are not authorize to delete the post!')
+        flash(' You are not authorize to delete the post!', 'danger')
         posts = Posts.query.order_by(Posts.date_posted)
         return render_template('posts.html', posts=posts)
 
@@ -490,8 +550,12 @@ def add_user():
     name = None
     form = UserForm()
     if form.validate_on_submit():
-        user = Users.query.filter_by(email=form.email.data).first()
-        if user is None:
+        user = Users.query.filter_by(username=form.username.data, email=form.email.data).first()
+        if user:
+            flash('The username is already taken. Please choose another one., "warning"')
+        else:
+
+        #if user is None:
             password = request.form.get('password_hash')
             hashed_pwd = generate_password_hash(password, method="sha256")
             user = Users(username=form.username.data, name=form.name.data, email=form.email.data,
@@ -499,6 +563,7 @@ def add_user():
                          password_hash=hashed_pwd)
             db.session.add(user)
             db.session.commit()
+
         name = form.name.data
         form.username.data = ''
         form.name.data = ''
@@ -530,7 +595,7 @@ def update(id):
             flash('User updated successfully', 'success')
             return render_template('dashboard.html', form=form, name_to_update=name_to_update)
         except:
-            flash('Error... Looks like there was a problem. Try again.')
+            flash('Error... Looks like there was a problem. Try again.', 'warning')
             return render_template('update.html', form=form, name_to_update=name_to_update)
 
     else:
