@@ -8,7 +8,11 @@
 
         <small>
             by: <a href="{{ url_for('user_posts', name=post.blogger.name) }}">{{ post.blogger.name }}</a> |
-            on: {{ post.date_posted }}</small><br/>
+            on: {{ post.date_posted }}
+        </small><br/>
+        <small  class="text-muted">
+            {% if post.blogger.last_seen %}<p>Last seen on: {{ post.blogger.last_seen }}</p>{% endif %}
+        </small>
 
         {{ post.content|safe }}
         <br/>

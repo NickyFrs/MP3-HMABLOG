@@ -72,6 +72,7 @@ class Users(db.Model, UserMixin):
     about_author = db.Column(db.Text(), nullable=True)
     data_added = db.Column(db.DateTime, default=datetime.utcnow)
     profile_pic = db.Column(db.String(), nullable=True)
+    last_seen = db.Column(db.DateTime, default=datetime.utcnow)
 
     # Manny posts to an user
     posts = db.relationship("Posts", backref="blogger")
@@ -205,6 +206,15 @@ def home():
 @app.route('/user_posts/<name>')
 def user(name):
     return render_template('user.html', name=name)
+
+
+# FUNCTION TO REGISTER USER LAST LOGGED SESSION
+# The @before_request decorator register the decorated function to be executed right before the view function
+@app.before_request
+def before_request():
+    if current_user.is_authenticated:
+        current_user.last_seen = datetime.utcnow()
+        db.session.commit()
 
 
 # USER POSTS PAGE
