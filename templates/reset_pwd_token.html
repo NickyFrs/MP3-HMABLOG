@@ -6,23 +6,17 @@
         <div class="shadow p-3 mb-5 bg-body rounded">
             <form action="" method="POST" class="form-control">
                 {{ form.hidden_tag() }}
-
-                {{ form.email.label(class="form-label") }}
-                {{ form.email(class="form-control") }}
-                <br />
                 {{ form.password.label(class="form-label") }}
                 {{ form.password(class="form-control") }}
                 <br />
+                {{ form.confirm_password.label(class="form-label") }}
+                {{ form.confirm_password(class="form-control") }}
+                <br />
+
 
 
                 {{ form.submit(class="btn btn-primary") }}
             </form>
-            <br/>
-            <small class="text-muted">
-                <a href="{{ url_for('reset_request') }}">Forgot your password?</a>
-            </small>
         </div>
-
-
 
 {% endblock content %}

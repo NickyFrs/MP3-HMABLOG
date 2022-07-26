@@ -1,9 +1,9 @@
 import os
-import uuid as uuid # created unique user id
+import uuid as uuid  # created unique user id
 from flask import Flask, render_template, flash, request, redirect, url_for
 from flask_wtf import FlaskForm
 from werkzeug.security import generate_password_hash, check_password_hash
-from werkzeug.utils import secure_filename #to secure the name of the uploaded file
+from werkzeug.utils import secure_filename  # to secure the name of the uploaded file
 from wtforms import StringField, SubmitField, PasswordField, TextAreaField, ValidationError
 from wtforms.validators import DataRequired, EqualTo, Email, length
 from flask_wtf.file import FileField
@@ -12,7 +12,8 @@ from flask_sqlalchemy import SQLAlchemy
 from flask_migrate import Migrate
 from datetime import datetime
 from flask_login import current_user, UserMixin, LoginManager, login_user, login_required, logout_user
-
+from itsdangerous import TimedJSONWebSignatureSerializer as Serializer # for creating a timed token for email recovery
+from flask_mail import Mail, Message
 
 app = Flask(__name__)
 
@@ -25,22 +26,26 @@ app.config['SECRET_KEY'] = 'b41bfb66739bd67d09342ad24f6a699deb7cbac892273d95'  #
 UPLOAD_FOLDER = '/Users/New User/Desktop/MP3-HMABLOG/static/img/'
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 
-
 # DATABASE
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///hopedb.db'  # Add database
-#app.config['SQLALCHEMY_DATABASE_URI'] = 'postgres://zvchjsqllgphgm:db745bad88a33421152e2ede1cb7ab058557eafd958aeed4490fa0d0a4a566df@ec2-3-219-52-220.compute-1.amazonaws.com:5432/djp2i5ggn6q28'  # Add database
-#app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://postgres:Cherlina10@localhost/hopeblog-db'
-
-
+# app.config['SQLALCHEMY_DATABASE_URI'] = 'postgres://zvchjsqllgphgm:db745bad88a33421152e2ede1cb7ab058557eafd958aeed4490fa0d0a4a566df@ec2-3-219-52-220.compute-1.amazonaws.com:5432/djp2i5ggn6q28'  # Add database
+# app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://postgres:Cherlina10@localhost/hopeblog-db'
 db = SQLAlchemy(app)
 migrate = Migrate(app, db)
-
 
 # FLASK LOGIN CONFIGURATION AND INITIALIZATION
 login_manager = LoginManager()
 login_manager.init_app(app)
 login_manager.login_view = 'login'  # where should the user be redirected if we are not logged in and a login is required
 
+# TELL APP HOW TO SEND EMAIL
+app.config['MAIL_SERVER'] = 'smtp.google.mail.com'
+app.config['MAIL_PORT'] = 587
+app.config['MAIL_USE_TLS'] = True
+app.config['MAIL_USERNAME'] = os.environ.get('GM_USR')
+app.config['MAIL_PASSWORD'] = os.environ.get('GM_PWD')
+
+mail = Mail(app)
 
 # USERS DATABASE MODEL
 class Users(db.Model, UserMixin):
@@ -74,6 +79,21 @@ class Users(db.Model, UserMixin):
     # Created a function for how the database will be shown to the user
     def __repr__(self):
         return '<Name %r>' % self.name
+
+    # METHOD TO CREATE TOKEN FOR EMAIL RECOVERY
+    def get_reset_token(self, expires_sec=1800):
+        s = Serializer(app.config['SECRET_KEY'], expires_sec)
+        return s.dump({'users.id': self.id}).decode('utf8')
+
+    # METHOD TO VERIFY TOKEN FOR EMAIL RECOVERY
+    @staticmethod  # this tels python not expect the self argument just the token(in this case) argument
+    def verify_reset_token(token):
+        s = Serializer(app.config['SECRET_KEY'])
+        try:
+            user_id = s.loads(token)['user.id']
+        except:
+            return None
+        return Users.query.get(user_id)
 
 
 # BLOG POST MODEL
@@ -109,15 +129,42 @@ class UserForm(FlaskForm):
     profile_pic = FileField('Profile Picture')
     submit = SubmitField("Submit")
 
+    def validate_username(self, username):
+        user = Users.query.filter_by(username=username.data).first()
+        if user:
+            raise ValidationError("The username is already taken. Please choose another one.", "warning")
 
+    def validate_email(self, email):
+        user = Users.query.filter_by(email=email.data).first()
+        if user:
+            raise ValidationError("The E-Mail is already taken. Please choose different one.", "warning")
 
 
 # LOGIN FORM
 class LoginForm(FlaskForm):
-    #username = StringField("Username", validators=[DataRequired()])
+    # username = StringField("Username", validators=[DataRequired()])
     email = StringField("Email", validators=[DataRequired(), Email()])
     password = PasswordField('Password', validators=[DataRequired()])
     submit = SubmitField("Login")
+
+
+# FORM TO REQUEST RESET PASSWORD
+class RequestResetForm(FlaskForm):
+    email = StringField("Email", validators=[DataRequired(), Email()])
+    submit = SubmitField("Send Request")
+
+    def validate_email(self, email):
+        user = Users.query.filter_by(email=email.data).first()
+        if user:
+            raise ValidationError("There is no account with that E-Mail. You must register first", "warning")
+
+
+# RESET PASSWORD FORM
+class ResetPasswordForm(FlaskForm):
+    password = PasswordField('Password',
+                             validators=[DataRequired(), EqualTo('confirm_password', message='Password most match')])
+    confirm_password = PasswordField('Confirm Password', validators=[DataRequired()])
+    submit = SubmitField("Reset Password")
 
 
 # SEARCH FORM
@@ -157,7 +204,6 @@ def user_posts(name):
     return render_template('user_posts.html', name=name, user_posts=user_posts)
 
 
-
 # ADMIN PAGE
 @app.route('/admin')
 @login_required
@@ -172,10 +218,10 @@ def admin():
 
 
 # Pass variable to an extended file
-#@app.context_processor  # context_processor will pass a variable for any {% extends 'file.html' %}
-#def base(): # this can be called anything but base as the search is inside the base file
-    #form = SearchForm()
-    #return dict(form=form) #dict for dictionary
+# @app.context_processor  # context_processor will pass a variable for any {% extends 'file.html' %}
+# def base(): # this can be called anything but base as the search is inside the base file
+# form = SearchForm()
+# return dict(form=form) #dict for dictionary
 
 
 # SEARCH FUNCTION
@@ -193,7 +239,7 @@ def admin():
 #         return render_template('search.html', form=form, searched=post.searched, search_found=search_found)
 
 # LOGIN DECORATOR
-@login_manager.user_loader #load users when login
+@login_manager.user_loader  # load users when login
 def load_user(user_id):
     return Users.query.get(int(user_id))
 
@@ -225,6 +271,58 @@ def logout():
     logout_user()
     flash('You are now logged out!, Thank you for passing by, see you soon!... :-)', 'success')
     return redirect(url_for('home'))
+
+
+# FUNCTION TO SEND EMAILS
+def send_rest_email(user):
+    token = user.get_reset_token()
+    msg = Message('Password Reset Request',
+                  sender='noreply@gmail.com',
+                  recipient = [user.email])
+
+    msg.body = f''' To reset your password, please go to this link:
+{url_for('reset_pwd_token', token=token, _external=True)} # _external=True is to get an absolute url not a relative.
+
+If you did not make this request then simply ignore this email and no change will be made.
+'''
+    mail.send(msg)
+
+
+# RESET PWD REQUEST PAGE
+@app.route('/reset_pwd', methods=['GET', 'POST'])
+def reset_request():
+    if current_user.is_authenticated:
+        return redirect(url_for('dashboard'))
+    form = RequestResetForm()
+    if form.validate_on_submit():
+        user = Users.query.filter_by(email=form.email.data).first()
+        send_rest_email(user)
+        flash('Please check your email to reset your password', 'info')
+        return redirect(url_for('login'))
+    return render_template('reset_request.html', form=form, title='Reset Password')
+
+
+# RESET PWD PAGE
+@app.route('/reset_pwd/<token>', methods=['GET', 'POST'])
+def reset_pwd_token():
+    if current_user.is_authenticated:
+        return redirect(url_for('dashboard'))
+
+    #check for the reset token
+    user = Users.verify_reset_token(token)
+
+    if user is None:
+        flash('That is an invalid or expired token', 'warning')
+        return redirect(url_for('reset_request'))
+    form = ResetPasswordForm()
+    if form.validate_on_submit():
+        password = request.form.get('password')
+        hashed_pwd = generate_password_hash(password, method="sha256")
+        user.password = hashed_pwd
+        db.session.commit()
+        flash("Your password has been reset successfully!", "success")
+    return render_template('reset_pwd_token.html', form=form, title='Reset Password')
+
 
 
 # DASHBOARD PAGE
@@ -301,35 +399,34 @@ def posts():
 @app.route('/posts/edit/<int:id>', methods=['GET', 'POST'])  # INT:ID WILL LET UD EDIT AND INDIVIDUAL POST
 @login_required
 def edit_post(id):
+    # grab the posts from the database
+    post = Posts.query.get_or_404(id)
+    form = PostForm()
 
-        # grab the posts from the database
-        post = Posts.query.get_or_404(id)
-        form = PostForm()
+    if form.validate_on_submit():
+        post.title = form.title.data
+        post.content = form.content.data
+        post.slug = form.slug.data
 
-        if form.validate_on_submit():
-            post.title = form.title.data
-            post.content = form.content.data
-            post.slug = form.slug.data
+        # Update post on the database
+        db.session.add(post)
+        db.session.commit()
 
-            # Update post on the database
-            db.session.add(post)
-            db.session.commit()
+        flash('Post has be updated successfully')
+        return redirect(url_for('post', id=post.id))
 
-            flash('Post has be updated successfully')
-            return redirect(url_for('post', id=post.id))
+    if current_user.id == post.blogger_id:
 
-        if current_user.id == post.blogger_id:
+        form.title.data = post.title
+        form.content.data = post.content
+        form.slug.data = post.slug
 
-            form.title.data = post.title
-            form.content.data = post.content
-            form.slug.data = post.slug
+        return render_template('edit_post.html', form=form)
 
-            return render_template('edit_post.html', form=form)
-
-        else:
-            flash(' You are not authorize to edit this post!', 'danger')
-            posts = Posts.query.order_by(Posts.date_posted)  # Query DB again
-            return render_template('posts.html', posts=posts)  # and redirect to the posts page
+    else:
+        flash(' You are not authorize to edit this post!', 'danger')
+        posts = Posts.query.order_by(Posts.date_posted)  # Query DB again
+        return render_template('posts.html', posts=posts)  # and redirect to the posts page
 
 
 # ADD POSTS TO THE DATABASE
@@ -361,7 +458,7 @@ def delete_post(id):
     post_to_delete = Posts.query.get_or_404(id)
     id = current_user.id
 
-    if id == post_to_delete.blogger.id: #check if the post to delete was created by the user
+    if id == post_to_delete.blogger.id:  # check if the post to delete was created by the user
         try:
             # Delete post from the database
             db.session.delete(post_to_delete)
@@ -386,6 +483,8 @@ def delete_post(id):
         return render_template('posts.html', posts=posts)
 
     # ADD USERS TO THE DATABASE
+
+
 @app.route('/user/add', methods=['GET', 'POST'])
 def add_user():
     name = None

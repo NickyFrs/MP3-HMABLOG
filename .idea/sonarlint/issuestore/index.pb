@@ -20,16 +20,12 @@ A
 migrations/README,8\b\8b9948ccb252e634d14f6b7f949d2e629f6f8f2a
 C
 templates/name.html,2\1\21f5b39dbf2b3b19e912caeeb6a59a9a663c0a8a
-D
-templates/login.html,f\f\ffdb36cd67c5e5e09ba8e92b13a1dc029c7c4627
 C
 templates/home.html,8\6\86f3a00c4de0ad1280042b4c75ce3672e5141a0f
 @
 requirements.txt,1\9\19359a61ae2446b51b549167b014da2fcf265768
 F
 migrations/alembic.ini,6\3\6363203731e53d99f7f2e253f95ee1f8aa0cec00
-G
-templates/add_user.html,a\a\aa7e5e117affac4f5dda62cbf22167326243695e
 G
 templates/add_post.html,e\d\ede77b19b9e221bc79d98d4e77516df78c50c7c0
 H
