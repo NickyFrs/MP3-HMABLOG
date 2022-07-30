@@ -18,7 +18,7 @@ from flask_migrate import Migrate
 from datetime import datetime
 from flask_login import current_user, UserMixin, LoginManager, login_user, login_required, logout_user
 from itsdangerous import TimedJSONWebSignatureSerializer as Serializer  # for creating a timed token for email recovery
-from flask_mail import Mail, Message
+from flask_mail import Message
 from flask_pymongo import PyMongo, MongoClient
 
 
@@ -55,20 +55,20 @@ notesdb = cluster["hopeblog"]
 
 # MAIL CONFIGURATION
 # TELL APP HOW TO SEND EMAIL
-app.config['MAIL_SERVER'] = 'smtp.gmail.com'  # your mail server
-app.config['MAIL_PORT'] = 587  # number of port your email server sending emails
-app.config['MAIL_USE_TLS'] = True  # security services from the email services. Encryption
-app.config['MAIL_USE_SSL'] = False  # security services from the email services. . Encryption
-app.config['MAIL_USERNAME'] = os.environ.get('GM_USR')
-app.config['MAIL_PASSWORD'] = os.environ.get('GM_PWD')
-app.config['MAIL_DEBUG'] = True
-app.config['MAIL_DEFAULT_SENDER'] = None  # ('name', 'email') # to set the from email address by default if not specified
-app.config['MAIL_MAX_EMAILS'] = None  # limit  the amount of emails send from one request.
-app.config['MAIL_ASCII_ATTACHMENTS'] = False  # converts the file name to ASCII
-app.config['MAIL_SUPPRESS_SEND'] = False  # similar to debug. testing purposes
-app.config['TESTING'] = True  # prevent from sending email while testing
+# app.config['MAIL_SERVER'] = 'smtp.gmail.com'  # your mail server
+# app.config['MAIL_PORT'] = 587  # number of port your email server sending emails
+# app.config['MAIL_USE_TLS'] = True  # security services from the email services. Encryption
+# app.config['MAIL_USE_SSL'] = False  # security services from the email services. . Encryption
+# app.config['MAIL_USERNAME'] = os.environ.get('GM_USR')
+# app.config['MAIL_PASSWORD'] = os.environ.get('GM_PWD')
+# app.config['MAIL_DEBUG'] = True
+# app.config['MAIL_DEFAULT_SENDER'] = None  # ('name', 'email') # to set the from email address by default if not specified
+# app.config['MAIL_MAX_EMAILS'] = None  # limit  the amount of emails send from one request.
+# app.config['MAIL_ASCII_ATTACHMENTS'] = False  # converts the file name to ASCII
+# app.config['MAIL_SUPPRESS_SEND'] = False  # similar to debug. testing purposes
+# app.config['TESTING'] = True  # prevent from sending email while testing
 
-mail = Mail(app)
+#mail = Mail(app)
 # mail = Mail()
 # mail.init_app(app)
 
