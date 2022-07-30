@@ -8,10 +8,10 @@
 
         <small>by: {{ post.blogger.first_name }} | on: {{ post.date_posted }}</small><br/>
 
-        {{ post.slug|safe }}<br/>
+        {{ post.slug|safe }}
+        <br/><br/>
 
-
-        <div class="card mb-3">
+        <div class="mb-3">
             <div class="row no-gutters">
                 <div class="col-md2">
                     {% if post.blogger.profile_pic %}
@@ -19,7 +19,7 @@
                              alt="user profile picture" width="100px" align="left">
                     {% else %}
                         <img src="{{ url_for('static', filename='/img/default_pic.png') }}"
-                     alt="default profile picture" align="right" width="100px">
+                     alt="default profile picture" align="left" width="100px">
                     {% endif %}
                 </div>
                 <div class="col-md-10">

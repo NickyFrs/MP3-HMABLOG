@@ -15,9 +15,9 @@
         </small>
 
         {{ post.slug|safe }}
-        <br/>
+        <br/><br/>
 
-        <div class="card mb-3">
+        <div class="mb-3">
             <div class="row no-gutters">
                 <div class="col-md2">
                     {% if post.blogger.profile_pic %}
@@ -25,7 +25,7 @@
                              alt="user profile picture" width="100px" align="left">
                     {% else %}
                         <img src="{{ url_for('static', filename='/img/default_pic.png') }}"
-                     alt="default profile picture" align="right" width="100px">
+                     alt="default profile picture" align="left" width="100px">
                     {% endif %}
                 </div>
                 <div class="col-md-10">
@@ -43,9 +43,8 @@
             </div>
         </div>
 
-        <br/><br/>
         <a href="{{ url_for('post', id=post.id) }}" class="btn btn-dark">View post</a>
-
+        <hr>
         {% if post.blogger_id == current_user.id %}
             <a href="{{ url_for('edit_post', id=post.id) }}" class="btn btn-dark">Edit post</a>
             <a href="{{ url_for('delete_post', id=post.id) }}" class="btn btn-danger">Delete post</a>

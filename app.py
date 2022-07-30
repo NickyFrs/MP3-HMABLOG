@@ -39,8 +39,8 @@ app.config['SECRET_KEY'] = 'b41bfb66739bd67d09342ad24f6a699deb7cbac892273d95'  #
 # -------------------------- DATABASE CONFIGURATION SETTINGS --------------------------------
 
 # DATABASE SETTINGS
-app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///hopedb.db'  # Add database
-# app.config['SQLALCHEMY_DATABASE_URI'] = 'postgres://zvchjsqllgphgm:db745bad88a33421152e2ede1cb7ab058557eafd958aeed4490fa0d0a4a566df@ec2-3-219-52-220.compute-1.amazonaws.com:5432/djp2i5ggn6q28'  # Add database
+#app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///hopedb.db'  # Add database
+app.config['SQLALCHEMY_DATABASE_URI'] = 'postgres://zvchjsqllgphgm:db745bad88a33421152e2ede1cb7ab058557eafd958aeed4490fa0d0a4a566df@ec2-3-219-52-220.compute-1.amazonaws.com:5432/djp2i5ggn6q28'  # Add database
 # app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://postgres:Cherlina10@localhost/hopeblog-db'
 db = SQLAlchemy(app)
 migrate = Migrate(app, db)
@@ -236,8 +236,11 @@ class UserForm(FlaskForm):
 # --- HOME ROUTE ---
 @app.route('/')
 def home():
-    first_name = "Nicky"
-    return render_template('home.html', first_name=first_name)
+    # grab the page we want do a query parameter, 1 is the default page
+    page = request.args.get('page', 1, type=int)
+    # grab all the posts from the database and paginate those posts
+    posts = Posts.query.order_by(Posts.date_posted).paginate(page=page, per_page=2)
+    return render_template('home.html', posts=posts, page=page)
 
 # --- ABOUT ROUTE ---
 @app.route('/about')
@@ -629,6 +632,7 @@ def delete_note(note_id):
 
 # --- ADD POST TO THE DATABASE ---
 @app.route('/add_post', methods=['GET', 'POST'])
+@login_required
 def add_post():
     name = None
     form = PostForm()
@@ -651,12 +655,12 @@ def add_post():
 
 # --- ALL POSTS PAGE ---
 @app.route('/posts')
+@login_required
 def posts():
     # grab the page we want do a query parameter, 1 is the default page
     page = request.args.get('page', 1, type=int)
     # grab all the posts from the database and paginate those posts
-    posts = Posts.query.order_by(Posts.date_posted)
-    posts = Posts.query.paginate(page=page, per_page=2)
+    posts = Posts.query.order_by(Posts.date_posted).paginate(page=page, per_page=2)
     return render_template('posts.html', posts=posts)
 
 
@@ -727,7 +731,8 @@ def edit_post(id):
 
 
 # ---- INDIVIDUAL POST PAGE ----
-@app.route('/posts/<int:id>')  # INT:ID WILL GET THE CLICKED POST TO VIEW FROM THE DB
+@app.route('/posts/<int:id>')
+@login_required# INT:ID WILL GET THE CLICKED POST TO VIEW FROM THE DB
 def post(id):
     # grab all the posts from the database
     post = Posts.query.get_or_404(id)
@@ -736,6 +741,7 @@ def post(id):
 
 # --- USER POSTS PAGE ---
 @app.route('/user/<first_name>')
+@login_required
 def user_posts(first_name):
     # grab the page we want do a query parameter, 1 is the default page
     page = request.args.get('page', 1, type=int)
