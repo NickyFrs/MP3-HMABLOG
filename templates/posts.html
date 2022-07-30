@@ -7,14 +7,14 @@
         <h2><a href="{{ url_for('post', id=post.id) }}">{{ post.title }}</a></h2>
 
         <small>
-            by: <a href="{{ url_for('user_posts', name=post.blogger.name) }}">{{ post.blogger.name }}</a> |
+            by: <a href="{{ url_for('user_posts', first_name=post.blogger.first_name) }}">{{ post.blogger.first_name }}</a> |
             on: {{ post.date_posted }}
         </small><br/>
         <small  class="text-muted">
             {% if post.blogger.last_seen %}<p>Last seen on: {{ post.blogger.last_seen }}</p>{% endif %}
         </small>
 
-        {{ post.content|safe }}
+        {{ post.slug|safe }}
         <br/>
 
         <div class="card mb-3">
@@ -30,7 +30,7 @@
                 </div>
                 <div class="col-md-10">
                     <div class="card-body">
-                        <h5 class="card-title">{{ post.blogger.name }}</h5>
+                        <h5 class="card-title">{{ post.blogger.first_name }}</h5>
                         <p class="card-text">
                             {% if post.blogger.about_author %}
                                 About the blogger: {{ post.blogger.about_author }}

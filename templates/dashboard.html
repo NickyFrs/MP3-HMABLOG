@@ -11,7 +11,7 @@
                <br/>
 
                 <strong>Username</strong>: {{ current_user.username }}<br/>
-                <strong>Name</strong>: {{ current_user.name}}<br/>
+                <strong>Name</strong>: {{ current_user.first_name|capitalize}} {{ current_user.last_name|capitalize}}<br/>
                 <strong>Email</strong>: {{ current_user.email }}<br/>
                 <strong>Favorite Color</strong>: {{ current_user. favorite_color}}<br/>
                 <strong>Date Joined</strong>: {{ current_user.data_added }}<br/>
@@ -44,12 +44,14 @@
                 {{ form.hidden_tag() }}
 
                 {{ form.username.label(class="form-label") }}
-                {{ form.username(class="form-control", value=name_to_update.name) }}
+                {{ form.username(class="form-control", value=name_to_update.username) }}
                 <br />
-                {{ form.name.label(class="form-label") }}
-                {{ form.name(class="form-control", value=name_to_update.email) }}
+                {{ form.first_name.label(class="form-label") }}
+                {{ form.first_name(class="form-control", value=name_to_update.first_name) }}
                 <br />
-
+                {{ form.last_name.label(class="form-label") }}
+                {{ form.last_name(class="form-control", value=name_to_update.last_name) }}
+                <br />
                 {{ form.email.label(class="form-label") }}
                 {{ form.email(class="form-control", value=name_to_update.email) }}
                 <br />

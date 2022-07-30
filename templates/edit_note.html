@@ -1,0 +1,82 @@
+{% extends 'base.html' %}
+
+{% block title %} Edit Note {% endblock title %}
+
+
+{% block content %}
+    <h3 class="center-align">Edit Note</h3>
+      <div class="row">
+      <!-- Form to add a new note -->
+        <form method="POST" action="{{ url_for('edit_note', note_id=note._id) }}">
+            <!-- Selection option field -->
+
+              <div class="mb-3">
+                  <label for="category_name" class="form-label">Note Category</label>
+                  <select name="category_name" id="category_name" class=validate" required>
+                          <option value="" , disabled selected>Choose a category</option>
+                      {% for category in categories %}
+                          {% if category.category_name == note.category_name %}
+                              <option value="{{ category.category_name }}" selected>{{ category.category_name }}</option>
+                          {% else %}
+                              <option value="{{ category.category_name }}">{{ category.category_name }}</option>
+                          {% endif %}
+                      {% endfor %}
+                  </select>
+              </div>
+
+            <!-- Note title field -->
+          <div>
+            <div class="mb-3">
+                <label for="note_title" class="form-label">Note Title</label>
+                <input id="note_title" value="{{ note.note_title }}" name="note_title" type="text"
+                     class="validate form-control" minlength="5" maxlength="50" required>
+            </div>
+          </div>
+            <!-- note Description field -->
+            <div class="mb-3">
+                <label for="note" class="form-label">Note</label>
+                <textarea id="note" name="note"
+                          class="form-control" minlength="5" maxlength="50" required>
+                    {{- note.note -}}
+                </textarea>
+            </div>
+
+            <!-- Due Date Calendar Picker -->
+            <div class="mb-3">
+                <label for="due_date" class="form-label">Due Date</label>
+                <input class="datepicker validate" value="{{ note.due_date }}"
+                     id="due_date" name="due_date" type="text" required>
+            </div>
+
+            <!-- Switch to choose if the note is Urgent -->
+            <div class="mb-3">
+               <div class="switch">
+                  <label for="is_urgent" class="form-label">
+                      {% if is_urgent == "on" %}
+                          <input type="checkbox" id="is_urgent" name="is_urgent" checked>
+                      {% else %}
+                          <input type="checkbox" id="is_urgent" name="is_urgent">
+                      {% endif %}
+
+                    <span class="lever"></span>
+                    Is Urgent
+                  </label>
+               </div>
+            </div>
+
+          <!-- Submit Button -->
+
+              <div class="mb-3">
+                  <a href="{{ url_for('notes') }}" class="btn btn-outline-secondary">Back to my notes</a>
+              </div>
+              <div class="mb-3">
+                 <button class="btn btn-outline-primary" type="submit" name="">Update
+                 </button>
+              </div>
+
+
+
+        </form>
+      </div>
+
+{% endblock %}

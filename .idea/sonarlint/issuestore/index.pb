@@ -46,3 +46,15 @@ D
 templates/admin.html,a\0\a02f370c569f95c7384578e9a07175aef619ad13
 C
 templates/base.html,d\a\da7c237b85a69c00a9ab8c189bf63e22070fcac3
+N
+templates/reset_pwd_token.html,5\7\572ee75df50b7e5453bce412846c238eb1c6df61
+L
+templates/reset_request.html,d\c\dca58d770d55dbd060ed7bd520bba3a88dae27cb
+D
+templates/login.html,f\f\ffdb36cd67c5e5e09ba8e92b13a1dc029c7c4627
+@
+requirements.txt,1\9\19359a61ae2446b51b549167b014da2fcf265768
+E
+templates/search.html,7\4\7466867770a9a75e68d7ba6d41285d0708e7aa67
+D
+templates/about.html,5\8\58893e517e4076b20838ca69fba7259ba475306a
