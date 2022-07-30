@@ -38,18 +38,18 @@ app.config['SECRET_KEY'] = 'b41bfb66739bd67d09342ad24f6a699deb7cbac892273d95'  #
 
 # -------------------------- DATABASE CONFIGURATION SETTINGS --------------------------------
 
-import re
+try:
+    prodURI = os.getenv('DATABASE_URL')
+    prodURI = prodURI.replace("postgres://", "postgresql://")
+    app.config['SQLALCHEMY_DATABASE_URI'] = 'postgres://zvchjsqllgphgm:db745bad88a33421152e2ede1cb7ab058557eafd958aeed4490fa0d0a4a566df@ec2-3-219-52-220.compute-1.amazonaws.com:5432/djp2i5ggn6q28'
 
-uri = os.getenv("DATABASE_URL")
-# or other relevant config var
-if uri.startswith("postgres://"):
-    uri = uri.replace("postgres://", "postgresql://", 1)
-    app.config['SQLALCHEMY_DATABASE_URI'] = uri
+except:
+    app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql:///msp3-hmablog'
 
 
 # DATABASE SETTINGS
 #app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///hopedb.db'  # Add database
-app.config['SQLALCHEMY_DATABASE_URI'] = 'postgres://zvchjsqllgphgm:db745bad88a33421152e2ede1cb7ab058557eafd958aeed4490fa0d0a4a566df@ec2-3-219-52-220.compute-1.amazonaws.com:5432/djp2i5ggn6q28'  # Add database
+#app.config['SQLALCHEMY_DATABASE_URI'] = 'postgres://zvchjsqllgphgm:db745bad88a33421152e2ede1cb7ab058557eafd958aeed4490fa0d0a4a566df@ec2-3-219-52-220.compute-1.amazonaws.com:5432/djp2i5ggn6q28'  # Add database
 # app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://postgres:Cherlina10@localhost/hopeblog-db'
 db = SQLAlchemy(app)
 migrate = Migrate(app, db)
