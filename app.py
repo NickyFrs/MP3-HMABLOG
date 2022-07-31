@@ -21,12 +21,10 @@ from itsdangerous import TimedJSONWebSignatureSerializer as Serializer  # for cr
 from flask_mail import Message
 from flask_pymongo import PyMongo, MongoClient
 
-
 app = Flask(__name__)
 
 # ADD RICH TEXT EDITOR - CKEditor
 ckeditor = CKEditor(app)
-
 
 if os.path.exists("env.py"):
     import env
@@ -34,18 +32,14 @@ if os.path.exists("env.py"):
 # APP CONFIGURATION
 app.config['SECRET_KEY'] = 'b41bfb66739bd67d09342ad24f6a699deb7cbac892273d95'  # necessary for the forms
 
-
-
 # -------------------------- DATABASE CONFIGURATION SETTINGS --------------------------------
 
 # DATABASE SETTINGS
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///hopedb.db'  # Add database
-#app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://gfpqbqxlcrgaot:2f8c11c7eb0f3c69317762fe0109a89ffc8ff67586448adbbac85e7f64e18de7@ec2-23-23-182-238.compute-1.amazonaws.com:5432/d2i9srt7qkuq1b'  # Add database
+#app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://kyqneglhhzcgkd:80015591c4d283bae5188f46373add82c469ebbc0caac5926e763e46be04bf02@ec2-52-204-157-26.compute-1.amazonaws.com:5432/deeu5b3rtte3oo'  # Add database
 # app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://postgres:Cherlina10@localhost/hopeblog-db'
 db = SQLAlchemy(app)
 migrate = Migrate(app, db)
-
-
 
 # -------- MONGO DB CONFIGURATION SETTINGS ------------------
 # MongDB database access
@@ -53,7 +47,6 @@ cluster = MongoClient("mongodb+srv://dbAuth:Ch3rl1na10@cluster0.rqlwn.mongodb.ne
 
 mongo = PyMongo()
 notesdb = cluster["hopeblog"]
-
 
 # MAIL CONFIGURATION
 # TELL APP HOW TO SEND EMAIL
@@ -70,7 +63,7 @@ notesdb = cluster["hopeblog"]
 # app.config['MAIL_SUPPRESS_SEND'] = False  # similar to debug. testing purposes
 # app.config['TESTING'] = True  # prevent from sending email while testing
 
-#mail = Mail(app)
+# mail = Mail(app)
 # mail = Mail()
 # mail.init_app(app)
 
@@ -78,7 +71,6 @@ notesdb = cluster["hopeblog"]
 login_manager = LoginManager()
 login_manager.init_app(app)
 login_manager.login_view = 'login'  # where should the user be redirected if we are not logged in and a login is required
-
 
 # SET LOCAL FOLDER TO SAVE FILES FOR USER PROFILE
 UPLOAD_FOLDER = '/Users/New User/Desktop/MP3-HMABLOG/static/img/'
@@ -244,6 +236,7 @@ def home():
     posts = Posts.query.order_by(Posts.date_posted).paginate(page=page, per_page=2)
     return render_template('home.html', posts=posts, page=page)
 
+
 # --- ABOUT ROUTE ---
 @app.route('/about')
 def about():
@@ -294,7 +287,7 @@ def add_user():
 
         else:
 
-        #if user is None:
+            # if user is None:
             password = request.form.get('password_hash')
             hashed_pwd = generate_password_hash(password, method="sha256")
             user = Users(username=form.username.data,
@@ -541,7 +534,6 @@ def update(id):
         return render_template('update.html', form=form, name_to_update=name_to_update, id=id)
 
 
-
 # ------------------------------------- NOTES ROUTES -------------------------------------
 
 # --- NOTES PAGE ---
@@ -557,7 +549,6 @@ def notes():
 @app.route('/add_note', methods=['GET', 'POST'])
 @login_required
 def add_note():
-
     if request.method == 'POST':
         is_urgent = "on" if request.form.get("is_urgent") else "off"
         note = {
@@ -579,7 +570,6 @@ def add_note():
 @app.route('/edit_note/<note_id>', methods=['GET', 'POST'])
 @login_required
 def edit_note(note_id):
-
     if request.method == 'POST':
         is_urgent = "on" if request.form.get("is_urgent") else "off"
         updated_note = {
@@ -604,11 +594,9 @@ def edit_note(note_id):
 @app.route('/delete_note/<note_id>', methods=['GET', 'POST'])
 @login_required
 def delete_note(note_id):
-        notesdb.notes.remove_one({"_id": ObjectId(note_id)})
-        flash("Note delete successfully!")
-        return redirect(url_for("main.notes"))
-
-
+    notesdb.notes.remove_one({"_id": ObjectId(note_id)})
+    flash("Note delete successfully!")
+    return redirect(url_for("main.notes"))
 
 
 # ----------------------------- POSTS ROUTES ----------------------------------
@@ -715,7 +703,7 @@ def edit_post(id):
 
 # ---- INDIVIDUAL POST PAGE ----
 @app.route('/posts/<int:id>')
-@login_required# INT:ID WILL GET THE CLICKED POST TO VIEW FROM THE DB
+@login_required  # INT:ID WILL GET THE CLICKED POST TO VIEW FROM THE DB
 def post(id):
     # grab all the posts from the database
     post = Posts.query.get_or_404(id)
@@ -786,7 +774,7 @@ Dear {{ user.username }},
 
 To reset your password click on the following link:
 
-{ url_for('reset_pwd_token', token=token, _external=True) }
+{url_for('reset_pwd_token', token=token, _external=True)}
 
 If you have not requested a password reset simply ignore this message.
 
@@ -826,7 +814,6 @@ The HMA Blog Team
     mail.send(msg)
 
     return flash('Message sent', 'info')
-
 
 
 if __name__ == '__main__':
