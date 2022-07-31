@@ -51,7 +51,5 @@ C
 templates/home.html,8\6\86f3a00c4de0ad1280042b4c75ce3672e5141a0f
 r
 Bmigrations/versions/c51115bd79de_added_a_couple_of_fields_to_db.py,b\e\be192e863dda2734b6f23375a06c4d5c7f1ec281
-D
-templates/posts.html,1\7\17b681f0d13f193b2b86c027cbf46fbf2cd926cb
 E
 templates/navbar.html,2\1\2152ecc432cb8e2a5acad94785c9a8c5a8df8cac
