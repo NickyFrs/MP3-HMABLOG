@@ -337,7 +337,8 @@ def dashboard():
     name_to_update = Users.query.get_or_404(id)
 
     if request.method == 'POST':
-        name_to_update.name = request.form['name']
+        name_to_update.first_name = request.form['first_name']
+        name_to_update.last_name = request.form['last_name']
         name_to_update.email = request.form['email']
         name_to_update.favorite_color = request.form['favorite_color']
         name_to_update.about_author = request.form['about_author']
