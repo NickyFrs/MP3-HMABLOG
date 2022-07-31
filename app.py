@@ -39,8 +39,8 @@ app.config['SECRET_KEY'] = 'b41bfb66739bd67d09342ad24f6a699deb7cbac892273d95'  #
 # -------------------------- DATABASE CONFIGURATION SETTINGS --------------------------------
 
 # DATABASE SETTINGS
-#app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///hopedb.db'  # Add database
-app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://gfpqbqxlcrgaot:2f8c11c7eb0f3c69317762fe0109a89ffc8ff67586448adbbac85e7f64e18de7@ec2-23-23-182-238.compute-1.amazonaws.com:5432/d2i9srt7qkuq1b'  # Add database
+app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///hopedb.db'  # Add database
+#app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://gfpqbqxlcrgaot:2f8c11c7eb0f3c69317762fe0109a89ffc8ff67586448adbbac85e7f64e18de7@ec2-23-23-182-238.compute-1.amazonaws.com:5432/d2i9srt7qkuq1b'  # Add database
 # app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://postgres:Cherlina10@localhost/hopeblog-db'
 db = SQLAlchemy(app)
 migrate = Migrate(app, db)
@@ -179,7 +179,7 @@ class PasswordForm(FlaskForm):
 class PostForm(FlaskForm):
     title = StringField("Title", validators=[DataRequired()])
     content = CKEditorField("Content", validators=[DataRequired()])
-    slug = StringField("Slug", validators=[DataRequired()])
+    slug = CKEditorField("Slug", validators=[DataRequired()])
     submit = SubmitField('Post')
 
 
@@ -215,7 +215,7 @@ class UserForm(FlaskForm):
     last_name = StringField("Last Name", validators=[DataRequired()])
     email = StringField("Email", validators=[DataRequired(), Email()])
     favorite_color = StringField("Favorite Color")
-    about_author = TextAreaField("About Me")
+    about_author = CKEditorField("About Me")
     password_hash = PasswordField('Password',
                                   validators=[DataRequired(), EqualTo('password_hash2', message='Password most match')])
     password_hash2 = PasswordField('Confirm Password', validators=[DataRequired()])
@@ -251,12 +251,6 @@ def about():
 
 
 # ------------------- USER ROUTES -----------------------
-
-# --- USER NAME ---
-@app.route('/user_posts/<name>')
-def user(name):
-    return render_template('user.html', name=name)
-
 
 # --- FUNCTION TO REGISTER USER LAST LOGGED SESSION ---
 # The @before_request decorator register the decorated function to be executed right before the view function
@@ -450,19 +444,6 @@ def logout():
     logout_user()
     flash('You are now logged out!, Thank you for passing by, see you soon!... :-)', 'success')
     return redirect(url_for('home'))
-
-
-# --- NAME PAGE ---
-@app.route('/name', methods=['GET', 'POST'])
-def name():
-    name = None
-    form = NameForm()
-    # Validated form
-    if form.validate_on_submit():
-        name = form.name.data
-        form.name.data = ''
-        flash("Form Submitted Successfully")
-    return render_template('name.html', name=name, form=form)
 
 
 # --- PASSWORD TEST PAGE ---

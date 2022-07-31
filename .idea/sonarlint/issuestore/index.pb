@@ -1,7 +1,4 @@
 
-:
-
-.gitignore,a\5\a5cc2925ca8258af241be7e5b0381edf30266302
 ^
 ..idea/inspectionProfiles/profiles_settings.xml,1\e\1e9075f5bf079c01ef2c910709e91a497d262080
 E
@@ -18,14 +15,8 @@ I
 migrations/script.py.mako,2\2\2271d770709026da8abd2dc327625dceb8d32bb5
 A
 migrations/README,8\b\8b9948ccb252e634d14f6b7f949d2e629f6f8f2a
-C
-templates/name.html,2\1\21f5b39dbf2b3b19e912caeeb6a59a9a663c0a8a
 F
 migrations/alembic.ini,6\3\6363203731e53d99f7f2e253f95ee1f8aa0cec00
-G
-templates/add_post.html,e\d\ede77b19b9e221bc79d98d4e77516df78c50c7c0
-H
-templates/edit_post.html,c\c\cc90fa623a65aae04f35b604e942bf2005dfea97
 n
 >migrations/versions/2105194adf34_added_a_profile_pic_column.py,6\8\68f518f077c7fd43b2a1023c3ae1c404ec388a02
 y
@@ -44,41 +35,23 @@ N
 templates/reset_pwd_token.html,5\7\572ee75df50b7e5453bce412846c238eb1c6df61
 L
 templates/reset_request.html,d\c\dca58d770d55dbd060ed7bd520bba3a88dae27cb
-D
-templates/login.html,f\f\ffdb36cd67c5e5e09ba8e92b13a1dc029c7c4627
 E
 templates/search.html,7\4\7466867770a9a75e68d7ba6d41285d0708e7aa67
-D
-templates/about.html,5\8\58893e517e4076b20838ca69fba7259ba475306a
-C
-templates/user.html,5\3\53630e1934f2a3a58f1ce92f49404ad1e7eb6ec9
-G
-templates/add_note.html,6\e\6e2ae7d6891c15332cb644ec4bdb5fbf57a67330
 D
 templates/notes.html,a\8\a898851c516a986e71f4b7e49d8a1e336433a70f
 H
 templates/dashboard.html,1\9\193f98aa913c5a3f5c398c0a9a3c7257df4114a3
-E
-templates/update.html,9\7\979b738b72e7bfaaa1d57c6d21bc807d5c38fc3e
-G
-templates/add_user.html,a\a\aa7e5e117affac4f5dda62cbf22167326243695e
 @
 requirements.txt,1\9\19359a61ae2446b51b549167b014da2fcf265768
 8
 Procfile,b\c\bc3c68e880d1a01632bce79f69dd1387c7ba9c54
-C
-templates/base.html,d\a\da7c237b85a69c00a9ab8c189bf63e22070fcac3
 H
 templates/edit_note.html,5\1\51c86fb916a87d392cbb6fd13702b4d380107ff7
-C
-templates/post.html,0\5\057d255c6f140964959b40e92346d8831c25b49d
 C
 templates/home.html,8\6\86f3a00c4de0ad1280042b4c75ce3672e5141a0f
 r
 Bmigrations/versions/c51115bd79de_added_a_couple_of_fields_to_db.py,b\e\be192e863dda2734b6f23375a06c4d5c7f1ec281
 D
 templates/posts.html,1\7\17b681f0d13f193b2b86c027cbf46fbf2cd926cb
-I
-templates/user_posts.html,1\8\1833a2aae0575837ce7caa0238ef61c9808dfeea
 E
 templates/navbar.html,2\1\2152ecc432cb8e2a5acad94785c9a8c5a8df8cac

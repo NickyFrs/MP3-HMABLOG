@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="DataSourceManagerImpl" format="xml" multifile-model="true">
-    <data-source source="LOCAL" name="hopedb" uuid="7a3fdc86-393d-40f7-a550-46617a76a0b5">
+    <data-source source="LOCAL" name="hopedb" uuid="b583370b-9a16-4c68-8861-1902c5e722f3">
       <driver-ref>sqlite.xerial</driver-ref>
       <synchronize>true</synchronize>
       <jdbc-driver>org.sqlite.JDBC</jdbc-driver>
