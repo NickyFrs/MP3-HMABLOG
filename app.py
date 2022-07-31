@@ -93,7 +93,7 @@ class Posts(db.Model):
     title = db.Column(db.String(255))
     content = db.Column(db.Text)
     date_posted = db.Column(db.DateTime, default=datetime.utcnow)
-    slug = db.Column(db.String(255))
+    slug = db.Column(db.Text)
 
     # Foreing Key
     blogger_id = db.Column(db.Integer, db.ForeignKey('users.id'))
