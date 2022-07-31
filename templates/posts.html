@@ -13,9 +13,8 @@
         <small  class="text-muted">
             {% if post.blogger.last_seen %}<p>Last seen on: {{ post.blogger.last_seen }}</p>{% endif %}
         </small>
-
+        <!-- POST PREVIEW -->
         {{ post.slug|safe }}
-        <br/>
 
         <div class="mb-3">
             <div class="row no-gutters">
@@ -42,17 +41,17 @@
                 </div>
             </div>
         </div>
-
+        <!-- POST BUTTONS -->
         <a href="{{ url_for('post', id=post.id) }}" class="btn btn-dark">View post</a>
-        <hr>
+
         {% if post.blogger_id == current_user.id %}
             <a href="{{ url_for('edit_post', id=post.id) }}" class="btn btn-dark">Edit post</a>
             <a href="{{ url_for('delete_post', id=post.id) }}" class="btn btn-danger">Delete post</a>
             <br/>
-            <hr>
         {% endif %}
+        <hr>
     {% endfor %}
-    <br/>
+    <!-- POSTS PAGINATION -->
     <div class="row">
         <small>Pages:
         <!-- Pagination -->

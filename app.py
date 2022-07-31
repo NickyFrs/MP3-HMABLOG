@@ -583,7 +583,7 @@ def edit_note(note_id):
 
         }
         notesdb.notes.replace_one({"_id": ObjectId(note_id)}, updated_note)
-        flash("Note updated successfully!")
+        flash("Note updated successfully!", "success")
         return redirect(url_for("notes"))
 
     note = notesdb.notes.find_one({"_id": ObjectId(note_id)})
@@ -596,7 +596,7 @@ def edit_note(note_id):
 @login_required
 def delete_note(note_id):
     notesdb.notes.remove_one({"_id": ObjectId(note_id)})
-    flash("Note delete successfully!")
+    flash("Note delete successfully!", "warning")
     return redirect(url_for("main.notes"))
 
 

@@ -37,18 +37,12 @@ L
 templates/reset_request.html,d\c\dca58d770d55dbd060ed7bd520bba3a88dae27cb
 E
 templates/search.html,7\4\7466867770a9a75e68d7ba6d41285d0708e7aa67
-D
-templates/notes.html,a\8\a898851c516a986e71f4b7e49d8a1e336433a70f
 H
 templates/dashboard.html,1\9\193f98aa913c5a3f5c398c0a9a3c7257df4114a3
 @
 requirements.txt,1\9\19359a61ae2446b51b549167b014da2fcf265768
 8
 Procfile,b\c\bc3c68e880d1a01632bce79f69dd1387c7ba9c54
-H
-templates/edit_note.html,5\1\51c86fb916a87d392cbb6fd13702b4d380107ff7
-C
-templates/home.html,8\6\86f3a00c4de0ad1280042b4c75ce3672e5141a0f
 r
 Bmigrations/versions/c51115bd79de_added_a_couple_of_fields_to_db.py,b\e\be192e863dda2734b6f23375a06c4d5c7f1ec281
 E

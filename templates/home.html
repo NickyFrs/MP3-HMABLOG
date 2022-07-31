@@ -20,7 +20,7 @@
                     <figure class="mb-4"><img class="img-fluid rounded" src="{{ url_for("static", filename="/img/blog-header.png")}}" alt="Main page picture header, Blog" /></figure>
                     <!-- Post content-->
                     <section class="mb-5">
-                        <p class="fs-5 mb-4">We exist to provide students of all ages with the opportunity to develop their musical discipline with the aim of reinforcing and inculcating artistic expression and creative growth.</p>
+                        <p class="fs-5 mb-4">We exist to provide students of all ages with the opportunity to develop their musical discipline with the aim of reinforcing and promoting artistic expression and creative growth.</p>
                         <p class="fs-5 mb-4">We also love the idea of community and learning, it is because of this reason that we decided to create a blog where we can share articles and news about relevant topics, as well as providing a platform for discussing those topics.</p>
                         <p class="fs-5 mb-4">You share more than welcome to browse the content, and hopefully, fingers crossed, you decide to join us </p>
                         <h2 class="fw-bolder mb-4 mt-5">Latest posts</h2>
@@ -31,7 +31,7 @@
                             </small>
                             <br/>
                             {{ post.slug|safe }}
-                            <br/>
+
                             <a href="{{ url_for('post', id=post.id) }}" class="btn btn-dark">View post</a>
                             <hr>
                         {% endfor %}
