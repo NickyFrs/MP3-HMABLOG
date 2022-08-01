@@ -384,8 +384,10 @@ def dashboard():
 @app.route('/delete/<int:id>')
 @login_required
 def delete(id):
+
     if id == current_user.id:
         user_to_delete = Users.query.get_or_404(id)
+
         name = None
         form = UserForm()
 
@@ -396,6 +398,9 @@ def delete(id):
 
             our_users = Users.query.order_by(Users.data_added)
             return render_template('add_user.html', form=form, name=name, our_users=our_users)
+
+            flash("Blogger delete successfully!", "warning")
+            return redirect(url_for("home"))
 
         except:
             flash('There was a problem deleting user, try again', 'warning')

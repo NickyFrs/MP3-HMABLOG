@@ -6,7 +6,7 @@
     <div class="container">
         <div class="row">
             <div class="col-8">
-               <h2>Hi {{ current_user.name|capitalize }}!</h2>
+               <h2>Hi {{ current_user.first_name|capitalize }}!</h2>
                <p>You are now logged in</p>
                <br/>
 
@@ -20,7 +20,7 @@
 
                 <br/><br/>
                 <a href="{{ url_for('update', id=current_user.id) }}" class="btn btn-warning">Update Profile</a>
-                <a href="{{ url_for('delete', id=current_user.id) }}" class="btn btn-danger">Delete</a>
+                <a href="{{ url_for('delete', id=current_user.id, user_id=current_user.id) }}" class="btn btn-danger">Delete</a>
                 <a href="{{ url_for('logout') }}" class="btn btn-outline-success">Logout</a>
                 <br/><br/>
             </div>
