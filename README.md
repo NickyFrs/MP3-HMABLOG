@@ -1,4 +1,7 @@
-![CI logo](https://codeinstitute.s3.amazonaws.com/fullstack/ci_logo_small.png)
+
+
+
+![Mockup Screenshot](https://ui.dev/amiresponsive?url=https://msp3-hmablog.herokuapp.com)
 
 Welcome USER_NAME,
 

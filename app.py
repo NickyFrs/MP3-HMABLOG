@@ -5,19 +5,24 @@ import jwt
 from time import time
 
 from bson import ObjectId
-from flask import Flask, render_template, flash, request, redirect, url_for, session
+from flask import Flask, render_template, \
+    flash, request, redirect, url_for, session
 from flask_wtf import FlaskForm
 from werkzeug.security import generate_password_hash, check_password_hash
-from werkzeug.utils import secure_filename  # to secure the name of the uploaded file
-from wtforms import StringField, SubmitField, PasswordField, TextAreaField, ValidationError
-from wtforms.validators import DataRequired, EqualTo, Email, length
+# to secure the name of the uploaded file
+from werkzeug.utils import secure_filename
+from wtforms import StringField, SubmitField, \
+    PasswordField, TextAreaField, ValidationError
+from wtforms.validators import DataRequired, EqualTo, Email
 from flask_wtf.file import FileField
 from flask_ckeditor import CKEditorField, CKEditor
 from flask_sqlalchemy import SQLAlchemy
 from flask_migrate import Migrate
 from datetime import datetime
-from flask_login import current_user, UserMixin, LoginManager, login_user, login_required, logout_user
-from itsdangerous import TimedJSONWebSignatureSerializer as Serializer  # for creating a timed token for email recovery
+from flask_login import current_user, UserMixin, LoginManager, \
+    login_user, login_required, logout_user
+# for creating a timed token for email recovery
+from itsdangerous import TimedJSONWebSignatureSerializer as Serializer
 from flask_mail import Message
 from flask_pymongo import PyMongo, MongoClient
 
@@ -30,14 +35,17 @@ if os.path.exists("env.py"):
     import env
 
 # APP CONFIGURATION
-app.config['SECRET_KEY'] = 'b41bfb66739bd67d09342ad24f6a699deb7cbac892273d95'  # necessary for the forms
+# necessary for the forms
+app.config['SECRET_KEY'] = 'b41bfb66739bd67d09342ad24f6a699deb7cbac892273d95'
 
-# -------------------------- DATABASE CONFIGURATION SETTINGS --------------------------------
+# ----------- DATABASE CONFIGURATION SETTINGS ------------------
 
 # DATABASE SETTINGS
-#app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///hopedb.db'  # Add database
-app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://xxawkgecbrmqhv:cd3626d55ccccf2b591257ad3a9ac43f70d5ab848ceb9d88a87c0320d9694d61@ec2-52-203-118-49.compute-1.amazonaws.com:5432/dbb44fb5r8v208'  # Add database
-# app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://postgres:Cherlina10@localhost/hopeblog-db'
+# app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///hopedb.db'  # Add database
+# Add database
+app.config[
+    'SQLALCHEMY_DATABASE_URI'] = 'postgresql://xxawkgecbrmqhv:cd3626d55ccccf2b591257ad3a9ac43f70d5ab848ceb9d88a87c0320d9694d61@ec2-52-203-118-49.compute-1.amazonaws.com:5432/dbb44fb5r8v208'
+
 db = SQLAlchemy(app)
 migrate = Migrate(app, db)
 
@@ -48,20 +56,30 @@ cluster = MongoClient("mongodb+srv://dbAuth:Ch3rl1na10@cluster0.rqlwn.mongodb.ne
 mongo = PyMongo()
 notesdb = cluster["hopeblog"]
 
-# MAIL CONFIGURATION
+# ---- MAIL CONFIGURATION (Future Feature) ---------
 # TELL APP HOW TO SEND EMAIL
-# app.config['MAIL_SERVER'] = 'smtp.gmail.com'  # your mail server
-# app.config['MAIL_PORT'] = 587  # number of port your email server sending emails
-# app.config['MAIL_USE_TLS'] = True  # security services from the email services. Encryption
-# app.config['MAIL_USE_SSL'] = False  # security services from the email services. . Encryption
+# your mail server
+# app.config['MAIL_SERVER'] = 'smtp.gmail.com'
+# number of port your email server sending emails
+# app.config['MAIL_PORT'] = 587
+# security services from the email services. Encryption
+# app.config['MAIL_USE_TLS'] = True
+# app.config['MAIL_USE_SSL'] = False
+# security services from the email services. . Encryption
 # app.config['MAIL_USERNAME'] = os.environ.get('GM_USR')
 # app.config['MAIL_PASSWORD'] = os.environ.get('GM_PWD')
 # app.config['MAIL_DEBUG'] = True
-# app.config['MAIL_DEFAULT_SENDER'] = None  # ('name', 'email') # to set the from email address by default if not specified
-# app.config['MAIL_MAX_EMAILS'] = None  # limit  the amount of emails send from one request.
-# app.config['MAIL_ASCII_ATTACHMENTS'] = False  # converts the file name to ASCII
-# app.config['MAIL_SUPPRESS_SEND'] = False  # similar to debug. testing purposes
-# app.config['TESTING'] = True  # prevent from sending email while testing
+# ('name', 'email') # to set the from email address by default if not specified
+# app.config[
+#   'MAIL_DEFAULT_SENDER'] = None
+# limit the amount of emails sends from one request.
+# app.config['MAIL_MAX_EMAILS'] = None
+# converts the file name to ASCII
+# app.config['MAIL_ASCII_ATTACHMENTS'] = False
+# similar to debug. testing purposes'
+# app.config['MAIL_SUPPRESS_SEND'] = False
+# prevent from sending email while testing
+# app.config['TESTING'] = True  g
 
 # mail = Mail(app)
 # mail = Mail()
@@ -77,8 +95,7 @@ UPLOAD_FOLDER = '/Users/New User/Desktop/MP3-HMABLOG/static/img/'
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 
 
-# ----------------------------- DATABASE MODELS --------------------------------------------
-
+# --------------------- DATABASE MODELS ------------------------
 # ---- BLOG POST MODEL ----
 class Posts(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -126,7 +143,8 @@ class Users(db.Model, UserMixin):
     def __repr__(self):
         return '<Name %r>' % self.name
 
-    # token generation and verification functions methods for user password recovery
+    # token generation and verification
+    # functions methods for user password recovery
     # METHOD TO CREATE TOKEN FOR EMAIL RECOVERY
     def get_reset_password_token(self, expires_in=1800):
         return jwt.encode(
@@ -134,7 +152,9 @@ class Users(db.Model, UserMixin):
             app.config['SECRET_KEY'], algorithm='HS256')
 
     # METHOD TO VERIFY TOKEN FOR EMAIL RECOVERY
-    @staticmethod  # this tels' python not expect the self argument just the token(in this case) argument
+    # this tels' python not expect the self argument just
+    # the token(in this case) argument
+    @staticmethod
     def verify_reset_password_token(token):
         try:
             user_id = jwt.decode(token, app.config['SECRET_KEY'],
@@ -144,8 +164,7 @@ class Users(db.Model, UserMixin):
         return Users.query.get(user_id)
 
 
-# ----------------------------- FORMS CREATION --------------------------------------------
-
+# ------------------------- FORMS CREATION -----------------------
 # ---- LOGIN FORM ----
 class LoginForm(FlaskForm):
     # username = StringField("Username", validators=[DataRequired()])
@@ -162,8 +181,10 @@ class NameForm(FlaskForm):
 
 # ---- PASSWORD TEST FORM ----
 class PasswordForm(FlaskForm):
-    email = StringField("What's your email", validators=[DataRequired()])
-    password_hash = PasswordField("What's your password", validators=[DataRequired()])
+    email = StringField("What's your email",
+                        validators=[DataRequired()])
+    password_hash = PasswordField("What's your password",
+                                  validators=[DataRequired()])
     submit = SubmitField("Submit")
 
 
@@ -183,14 +204,19 @@ class RequestResetForm(FlaskForm):
     def validate_email(self, email):
         user = Users.query.filter_by(email=email.data).first()
         if user:
-            raise ValidationError("There is no account with that E-Mail. You must register first", "warning")
+            raise ValidationError(
+                "There is no account with that E-Mail. "
+                "You must register first", "warning")
 
 
 # ---- RESET PASSWORD FORM ----
 class ResetPasswordForm(FlaskForm):
-    password = PasswordField('Password',
-                             validators=[DataRequired(), EqualTo('confirm_password', message='Password most match')])
-    confirm_password = PasswordField('Confirm Password', validators=[DataRequired()])
+    password = PasswordField(
+        'Password', validators=[DataRequired(),
+                                EqualTo('confirm_password',
+                                        message='Password most match')])
+    confirm_password = PasswordField(
+        'Confirm Password', validators=[DataRequired()])
     submit = SubmitField("Reset Password")
 
 
@@ -208,24 +234,29 @@ class UserForm(FlaskForm):
     email = StringField("Email", validators=[DataRequired(), Email()])
     favorite_color = StringField("Favorite Color")
     about_author = CKEditorField("About Me")
-    password_hash = PasswordField('Password',
-                                  validators=[DataRequired(), EqualTo('password_hash2', message='Password most match')])
-    password_hash2 = PasswordField('Confirm Password', validators=[DataRequired()])
+    password_hash = PasswordField(
+        'Password', validators=[DataRequired(),
+                                EqualTo('password_hash2',
+                                        message='Password most match')])
+    password_hash2 = PasswordField(
+        'Confirm Password', validators=[DataRequired()])
     profile_pic = FileField('Profile Picture')
     submit = SubmitField("Submit")
 
     def validate_username(self, username):
         user = Users.query.filter_by(username=username.data).first()
         if user:
-            raise ValidationError("The username is already taken. Please choose another one.", "warning")
+            raise ValidationError("The username is already taken. "
+                                  "Please choose another one.", "warning")
 
     def validate_email(self, email):
         user = Users.query.filter_by(email=email.data).first()
         if user:
-            raise ValidationError("The E-Mail is already taken. Please choose different one.", "warning")
+            raise ValidationError("The E-Mail is already taken. "
+                                  "Please choose different one.", "warning")
 
 
-# ------------------------------------ APP ROUTES --------------------------------------------
+# ----------------- APP ROUTES -----------------------
 
 # --- HOME ROUTE ---
 @app.route('/')
@@ -233,7 +264,8 @@ def home():
     # grab the page we want do a query parameter, 1 is the default page
     page = request.args.get('page', 1, type=int)
     # grab all the posts from the database and paginate those posts
-    posts = Posts.query.order_by(Posts.date_posted).paginate(page=page, per_page=2)
+    posts = Posts.query.order_by(
+        Posts.date_posted).paginate(page=page, per_page=2)
     return render_template('home.html', posts=posts, page=page)
 
 
@@ -246,7 +278,8 @@ def about():
 # ------------------- USER ROUTES -----------------------
 
 # --- FUNCTION TO REGISTER USER LAST LOGGED SESSION ---
-# The @before_request decorator register the decorated function to be executed right before the view function
+# The @before_request decorator register the decorated
+# function to be executed right before the view function
 @app.before_request
 def before_request():
     if current_user.is_authenticated:
@@ -263,7 +296,8 @@ def admin():
     if id == 1:
         return render_template('admin.html')
     else:
-        flash('Sorry only administrators have access to this page', 'warning')
+        flash('Sorry only administrators have access to this page',
+              'warning')
         return redirect(url_for('dashboard'))
 
 
@@ -274,12 +308,15 @@ def add_user():
 
     form = UserForm()
     if form.validate_on_submit():
-        user = Users.query.filter_by(username=form.username.data, email=form.email.data).first()
-        m_user = notesdb.users.find_one({"username": request.form.get('username')},
-                                        {"email": request.form.get('email')})
+        user = Users.query.filter_by(username=form.username.data,
+                                     email=form.email.data).first()
+        m_user = notesdb.users.find_one(
+            {"username": request.form.get('username')},
+            {"email": request.form.get('email')})
 
         if user:
-            flash('The username is already taken. Please choose another one., "warning"')
+            flash('The username is already taken. '
+                  'Please choose another one., "warning"')
 
         if m_user:
             flash("User already exists", "danger")
@@ -303,7 +340,8 @@ def add_user():
             register = {
                 "username": request.form.get('username'),
                 "email": request.form.get('email'),
-                "password": generate_password_hash(request.form.get('password_hash')),
+                "password": generate_password_hash(
+                    request.form.get('password_hash')),
                 "first_name": request.form.get('first_name'),
                 "last_name": request.form.get('last_name'),
             }
@@ -312,7 +350,8 @@ def add_user():
             # start a session for the user
             session["users"] = request.form.get('email')
             login_user(current_user, remember=True)
-            flash("Registration Successful, account created. Thank you!", "succsess")
+            flash("Registration Successful, "
+                  "account created. Thank you!", "succsess")
             return redirect(url_for('home'))
 
         name = form.name.data
@@ -325,7 +364,8 @@ def add_user():
         flash('User Added Successfully', 'success')
 
     our_users = Users.query.order_by(Users.data_added)
-    return render_template('add_user.html', form=form, name=name, our_users=our_users)
+    return render_template('add_user.html', form=form,
+                           name=name, our_users=our_users)
 
 
 # ---- DASHBOARD PAGE ----
@@ -346,7 +386,8 @@ def dashboard():
 
         # check for profile pic
         if request.files['profile_pic']:
-            name_to_update.profile_pic = request.files['profile_pic']  # this upload the actual file
+            # this upload the actual file
+            name_to_update.profile_pic = request.files['profile_pic']
 
             # variable to grab image name
             pic_filename = secure_filename(name_to_update.profile_pic.filename)
@@ -364,18 +405,24 @@ def dashboard():
                 db.session.commit()
                 saver.save(os.path.join(app.config['UPLOAD_FOLDER'], pic_name))
                 flash('User updated successfully', 'success')
-                return render_template('dashboard.html', form=form, name_to_update=name_to_update)
+                return render_template(
+                    'dashboard.html', form=form,
+                    name_to_update=name_to_update)
             except:
-                flash('Error... Looks like there was a problem. Try again.', 'warning')
-                return render_template('dashboard.html', form=form, name_to_update=name_to_update)
+                flash('Error... Looks like there was a problem. '
+                      'Try again.', 'warning')
+                return render_template(
+                    'dashboard.html', form=form, name_to_update=name_to_update)
 
         else:
             db.session.commit()
             flash('User updated successfully', 'success')
-            return render_template('dashboard.html', form=form, name_to_update=name_to_update)
+            return render_template(
+                'dashboard.html', form=form, name_to_update=name_to_update)
 
     else:
-        return render_template('dashboard.html', form=form, name_to_update=name_to_update, id=id)
+        return render_template(
+            'dashboard.html', form=form, name_to_update=name_to_update, id=id)
 
     return render_template('dashboard.html')
 
@@ -384,7 +431,6 @@ def dashboard():
 @app.route('/delete/<int:id>')
 @login_required
 def delete(id):
-
     if id == current_user.id:
         user_to_delete = Users.query.get_or_404(id)
 
@@ -397,14 +443,16 @@ def delete(id):
             flash('User deleted successfully!', 'success')
 
             our_users = Users.query.order_by(Users.data_added)
-            return render_template('add_user.html', form=form, name=name, our_users=our_users)
+            return render_template(
+                'add_user.html', form=form, name=name, our_users=our_users)
 
             flash("Blogger delete successfully!", "warning")
             return redirect(url_for("home"))
 
         except:
             flash('There was a problem deleting user, try again', 'warning')
-            return render_template('add_user.html', form=form, name=name, our_users=our_users)
+            return render_template('add_user.html', form=form,
+                                   name=name, our_users=our_users)
     else:
         flash("Sorry you can't delete that user!", "danger")
         return redirect(url_for('dashboard'))
@@ -441,7 +489,9 @@ def login():
 @login_required
 def logout():
     logout_user()
-    flash('You are now logged out!, Thank you for passing by, see you soon!... :-)', 'success')
+    flash('You are now logged out!, '
+          'Thank you for passing by, '
+          'see you soon!... :-)', 'success')
     return redirect(url_for('home'))
 
 
@@ -469,7 +519,9 @@ def test_pw():
         # check hashed password
         passed = check_password_hash(pw_to_check.password_hash, password)
 
-    return render_template('test_pw.html', email=email, password=password, form=form, pw_to_check=pw_to_check,
+    return render_template('test_pw.html', email=email,
+                           password=password, form=form,
+                           pw_to_check=pw_to_check,
                            passed=passed)
 
 
@@ -483,13 +535,15 @@ def reset_request():
         user = Users.query.filter_by(email=form.email.data).first()
         if user:
             send_password_reset_email(user)
-            flash('Please check your email for the instructions to reset your password', 'info')
+            flash('Please check your email for the '
+                  'instructions to reset your password', 'info')
             return redirect(url_for('login'))
         else:
             flash('This email is not register, please sign up!', 'danger')
             return redirect(url_for('add_user'))
 
-    return render_template('reset_request.html', form=form, title='Reset Password')
+    return render_template('reset_request.html',
+                           form=form, title='Reset Password')
 
 
 # --- RESET PASSWORD PAGE ---
@@ -511,7 +565,8 @@ def reset_pwd_token(token):
         user.password = hashed_pwd
         db.session.commit()
         flash("Your password has been reset successfully!", "success")
-    return render_template('reset_pwd_token.html', form=form, title='Reset Password')
+    return render_template('reset_pwd_token.html',
+                           form=form, title='Reset Password')
 
 
 # --- UPDATE USER DATABASE RECORDS ---
@@ -531,24 +586,28 @@ def update(id):
         try:
             db.session.commit()
             flash('User updated successfully', 'success')
-            return render_template('dashboard.html', form=form, name_to_update=name_to_update)
+            return render_template('dashboard.html',
+                                   form=form, name_to_update=name_to_update)
         except:
-            flash('Error... Looks like there was a problem. Try again.', 'warning')
-            return render_template('update.html', form=form, name_to_update=name_to_update)
+            flash('Error... Looks like there was a problem.'
+                  'Try again.', 'warning')
+            return render_template(
+                'update.html', form=form, name_to_update=name_to_update)
 
     else:
-        return render_template('update.html', form=form, name_to_update=name_to_update, id=id)
+        return render_template(
+            'update.html', form=form, name_to_update=name_to_update, id=id)
 
 
-# ------------------------------------- NOTES ROUTES -------------------------------------
-
+# ---------------------- NOTES ROUTES ---------------------
 # --- NOTES PAGE ---
 @app.route('/notes')
 @login_required
 def notes():
     notes = list(notesdb.notes.find())
     users = notesdb.users.find()
-    return render_template("notes.html", user=current_user, notes=notes, users=users)
+    return render_template(
+        "notes.html", user=current_user, notes=notes, users=users)
 
 
 # --- ADD NOTE PAGE ---
@@ -569,7 +628,8 @@ def add_note():
         flash("New note added successfully!")
         return redirect(url_for("main.notes"))
     categories = notesdb.categories.find().sort("category_name", 1)
-    return render_template("add_note.html", user=current_user, categories=categories)
+    return render_template("add_note.html",
+                           user=current_user, categories=categories)
 
 
 # --- EDIT NOTE PAGE ---
@@ -593,7 +653,8 @@ def edit_note(note_id):
 
     note = notesdb.notes.find_one({"_id": ObjectId(note_id)})
     categories = notesdb.categories.find().sort("category_name", 1)
-    return render_template("edit_note.html", note=note, user=current_user, categories=categories)
+    return render_template("edit_note.html", note=note,
+                           user=current_user, categories=categories)
 
 
 # --- DELETE NOTE  ---
@@ -605,7 +666,7 @@ def delete_note(note_id):
     return redirect(url_for("main.notes"))
 
 
-# ----------------------------- POSTS ROUTES ----------------------------------
+# ------------------- POSTS ROUTES -------------------------
 
 # --- ADD POST TO THE DATABASE ---
 @app.route('/add_post', methods=['GET', 'POST'])
@@ -616,7 +677,10 @@ def add_post():
 
     if form.validate_on_submit():
         blogger = current_user.id
-        post = Posts(title=form.title.data, content=form.content.data, blogger_id=blogger, slug=form.slug.data)
+        post = Posts(title=form.title.data,
+                     content=form.content.data,
+                     blogger_id=blogger,
+                     slug=form.slug.data)
         form.title.data = ''
         form.content.data = ''
         form.slug.data = ''
@@ -637,18 +701,21 @@ def posts():
     # grab the page we want do a query parameter, 1 is the default page
     page = request.args.get('page', 1, type=int)
     # grab all the posts from the database and paginate those posts
-    posts = Posts.query.order_by(Posts.date_posted).paginate(page=page, per_page=2)
+    posts = Posts.query.order_by(Posts.date_posted).\
+        paginate(page=page, per_page=2)
     return render_template('posts.html', posts=posts)
 
 
 # --- DELETE POST FROM THE DATABASE ---
-@app.route('/posts/delete/<int:id>')  # INT:ID WILL LET UD EDIT AND INDIVIDUAL POST
+# INT:ID WILL LET UD EDIT AND INDIVIDUAL POST
+@app.route('/posts/delete/<int:id>')
 @login_required
 def delete_post(id):
     post_to_delete = Posts.query.get_or_404(id)
     id = current_user.id
 
-    if id == post_to_delete.blogger.id:  # check if the post to delete was created by the user
+    # check if the post to delete was created by the user
+    if id == post_to_delete.blogger.id:
         try:
             # Delete post from the database
             db.session.delete(post_to_delete)
@@ -656,16 +723,19 @@ def delete_post(id):
 
             # Return message
             flash('Blog post deleted successfully', 'success')
-
-            posts = Posts.query.order_by(Posts.date_posted)  # Query DB again
-            return render_template('posts.html', posts=posts)  # and redirect to the posts page
+            # Query DB again
+            posts = Posts.query.order_by(Posts.date_posted)
+            # and redirect to the posts page
+            return render_template('posts.html', posts=posts)
 
         except:
             # If error, show message
             flash('There was a problem deleting the post', 'warning')
-            # an d redirect again
-            posts = Posts.query.order_by(Posts.date_posted)  # Query DB again
-            return render_template('posts.html', posts=posts)  # and redirect to the posts page
+
+            # Query DB again
+            posts = Posts.query.order_by(Posts.date_posted)
+            # and redirect to the posts page
+            return render_template('posts.html', posts=posts)
 
     else:
         flash(' You are not authorize to delete the post!', 'danger')
@@ -674,7 +744,8 @@ def delete_post(id):
 
 
 # --- EDIT A POST ---
-@app.route('/posts/edit/<int:id>', methods=['GET', 'POST'])  # INT:ID WILL LET UD EDIT AND INDIVIDUAL POST
+@app.route('/posts/edit/<int:id>', methods=['GET', 'POST'])
+# INT:ID WILL LET UD EDIT AND INDIVIDUAL POST
 @login_required
 def edit_post(id):
     # grab the posts from the database
@@ -703,13 +774,16 @@ def edit_post(id):
 
     else:
         flash(' You are not authorize to edit this post!', 'danger')
-        posts = Posts.query.order_by(Posts.date_posted)  # Query DB again
-        return render_template('posts.html', posts=posts)  # and redirect to the posts page
+        # Query DB again
+        posts = Posts.query.order_by(Posts.date_posted)
+        # and redirect to the posts page
+        return render_template('posts.html', posts=posts)
 
 
 # ---- INDIVIDUAL POST PAGE ----
 @app.route('/posts/<int:id>')
-@login_required  # INT:ID WILL GET THE CLICKED POST TO VIEW FROM THE DB
+# INT:ID WILL GET THE CLICKED POST TO VIEW FROM THE DB
+@login_required
 def post(id):
     # grab all the posts from the database
     post = Posts.query.get_or_404(id)
@@ -727,14 +801,21 @@ def user_posts(first_name):
     user = Users.query.filter_by(first_name=first_name).first_or_404()
 
     # grab all the posts from the database and paginate those posts
-    user_posts = Posts.query.filter_by(blogger=user).order_by(Posts.date_posted).paginate(page=page, per_page=2)
-    return render_template('user_posts.html', first_name=first_name, user_posts=user_posts)
+    user_posts = Posts.query.filter_by(blogger=user)\
+        .order_by(Posts.date_posted)\
+        .paginate(page=page, per_page=2)
+
+    return render_template('user_posts.html',
+                           first_name=first_name,
+                           user_posts=user_posts)
 
 
-#  ---- SEARCH FUNCTION ----
+#  ---- SEARCH FUNCTION (Future Feature) ----
 # -- Pass variable to an extended file --
-# @app.context_processor  # context_processor will pass a variable for any {% extends 'file.html' %}
-# def base(): # this can be called anything but base as the search is inside the base file
+# context_processor will pass a variable for any {% extends 'file.html' %
+# @app.context_processor  }
+# this can be called anything but base as the search is inside the base file
+# def base():
 # form = SearchForm()
 # return dict(form=form) #dict for dictionary
 
@@ -746,13 +827,15 @@ def user_posts(first_name):
 #         #get data from the search form
 #         post.searched = form.search.data
 #         # qquery the DB
-#         search_found = user_search.filter(Posts.content.like('%' + post.searched + '%'))
+#         search_found = user_search.filter(
+#         Posts.content.like('%' + post.searched + '%'))
 #         search_found = user_search.order_by(Posts.title).all()
 #
-#         return render_template('search.html', form=form, searched=post.searched, search_found=search_found)
+#         return render_template('search.html',
+#         form=form, searched=post.searched, search_found=search_found)
 
 
-# ----------------------------- ERROR ROUTES ----------------------------------
+# ---------------------- ERROR ROUTES -----------------------
 
 # ---- Invalid URL ----
 @app.errorhandler(404)
@@ -766,60 +849,62 @@ def page_not_found(e):
     return render_template('500.html'), 500
 
 
-# ----------------------------- FUNCTIONS ----------------------------------
+# ---------------------- FUNCTIONS -----------------------
 
 # FUNCTION TO SEND EMAILS
-def send_password_reset_email(user):
-    token = user.get_reset_password_token()
-    msg = Message(subject='Password Reset Request',
-                  sender=('HMA-Blog', 'noreply@gmail.com'),
-                  recipients=[user.email])
-
-    msg.body = f''' 
-Dear {{ user.username }},
-
-To reset your password click on the following link:
-
-{url_for('reset_pwd_token', token=token, _external=True)}
-
-If you have not requested a password reset simply ignore this message.
-
-Sincerely,
-
-The HMA Blog Team
-'''
-    msg.html = f'''
-<p>Dear {{ user.username }},</p>
-<p>To reset your password 
-<a href="{{ url_for('reset_password', token=token, _external=True) }}">click here</a>.
-</p>
-<p>Alternatively, you can paste the following link in your browser's address bar:</p>
-<p>{{ url_for('reset_password', token=token, _external=True) }}</p>
-<p>If you have not requested a password reset simply ignore this message.</p>
-<p>Sincerely,</p>
-<p>The HMA Blog Team</p>
-'''
-
-    # mail.add_recipient('')
-    # with app.open_resource('name of file') as file:
-    # msg.attach('filename', 'MIME type of file i.e image/jpeg', file.read())
-    # PARAMETER WE CAN HAVE IN THE MESSAGE FUNCTION
-    # msg = Message(
-    #     subject = ' ',
-    #     recipients = [],
-    #     body = '',
-    #     html = '',
-    #     sender = '',
-    #     cc = [],
-    #     bcc = [],
-    #     reply_to = [],
-    #     date = 'date',
-    #     charset = ''
-    # )
-
-    mail.send(msg)
-
-    return flash('Message sent', 'info')
+# def send_password_reset_email(user):
+#     token = user.get_reset_password_token()
+#     msg = Message(subject='Password Reset Request',
+#                   sender=('HMA-Blog', 'noreply@gmail.com'),
+#                   recipients=[user.email])
+#
+#     msg.body = f'''
+# Dear {{ user.username }},
+#
+# To reset your password click on the following link:
+#
+# {url_for('reset_pwd_token', token=token, _external=True)}
+#
+# If you have not requested a password reset simply ignore this message.
+#
+# Sincerely,
+#
+# The HMA Blog Team
+# '''
+#     msg.html = f'''
+# <p>Dear { user.username },</p>
+# <p>To reset your password
+# <a href="{ url_for('reset_password',
+# token=token, _external=True) }">click here</a>.
+# </p>
+# <p>Alternatively, you can paste the following link
+# in your browser's address bar:</p>
+# <p>{ url_for('reset_password', token=token, _external=True) }</p>
+# <p>If you have not requested a password reset simply ignore this message.</p>
+# <p>Sincerely,</p>
+# <p>The HMA Blog Team</p>
+# '''
+#     # -- Parameter tha msg accept --
+#     # mail.add_recipient('')
+#     # with app.open_resource('name of file') as file:
+#     # msg.attach('filename', 'MIME type of file i.e image/jpeg', file.read())
+#     # PARAMETER WE CAN HAVE IN THE MESSAGE FUNCTION
+#     # msg = Message(
+#     #     subject = ' ',
+#     #     recipients = [],
+#     #     body = '',
+#     #     html = '',
+#     #     sender = '',
+#     #     cc = [],
+#     #     bcc = [],
+#     #     reply_to = [],
+#     #     date = 'date',
+#     #     charset = ''
+#     # )
+#
+#     #mail.send(msg)
+#
+#     return flash('Message sent', 'info')
 
 
 if __name__ == '__main__':
