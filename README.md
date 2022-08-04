@@ -1,4 +1,4 @@
-![Mockup Screenshot](https://ui.dev/amiresponsive?url=https://msp3-hmablog.herokuapp.com)
+![Mockup Screenshot](docs/mockup.png)
 
 # Hope Music Academy Blog
 
