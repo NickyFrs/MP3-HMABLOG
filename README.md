@@ -225,7 +225,7 @@ Link to repositories:
 [REPO - MSP3-HMABLOG](https://github.com/NickyFrs/MP3-HMABLOG)
 
 Link to Deployed Website:
-[Heroku Deployment](https://msp3-hmablog.heroku.app.com/)
+[Heroku Deployment](https://msp3-hmablog.herokuapp.com/)
 
 
 ## Technology
