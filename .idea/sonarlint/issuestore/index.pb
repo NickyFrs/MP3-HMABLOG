@@ -78,3 +78,7 @@ C
 templates/home.html,8\6\86f3a00c4de0ad1280042b4c75ce3672e5141a0f
 C
 templates/base.html,d\a\da7c237b85a69c00a9ab8c189bf63e22070fcac3
+H
+templates/dashboard.html,1\9\193f98aa913c5a3f5c398c0a9a3c7257df4114a3
+6
+app.py,1\3\13cce7fd076299c81b4986166f3d822791c9490e
