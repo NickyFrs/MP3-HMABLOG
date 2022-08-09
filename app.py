@@ -42,14 +42,9 @@ app.config['SECRET_KEY'] = 'b41bfb66739bd67d09342ad24f6a699deb7cbac892273d95'
 # ----------- DATABASE CONFIGURATION SETTINGS ------------------
 
 # DATABASE SETTINGS
-# app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///hopedb.db'  # Add database
 # Add database
-<<<<<<< HEAD
-app.config[
-    'SQLALCHEMY_DATABASE_URI'] = 'postgresql://zvcowkhewwcwqg:9031c3fc9cd057a977cfd4b72d4c9be4159572f51b3be0cd4796ca7dc08af84b@ec2-34-227-135-211.compute-1.amazonaws.com:5432/d897pieu6abro1'
-=======
-app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://zvcowkhewwcwqg:9031c3fc9cd057a977cfd4b72d4c9be4159572f51b3be0cd4796ca7dc08af84b@ec2-34-227-135-211.compute-1.amazonaws.com:5432/d897pieu6abro1'
->>>>>>> 09544a6 (dealing wi t problems with DB.)
+app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///hopedb.db'
+# app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://zvcowkhewwcwqg:9031c3fc9cd057a977cfd4b72d4c9be4159572f51b3be0cd4796ca7dc08af84b@ec2-34-227-135-211.compute-1.amazonaws.com:5432/d897pieu6abro1'
 
 db = SQLAlchemy(app)
 migrate = Migrate(app, db)
@@ -779,7 +774,7 @@ def delete_comment(comment_id):
     if not comment:
         flash("Comment not found", "warning")
 
-    elif current_user.id != comment.blogger.id and current_user.id != comment.post.blogger:
+    elif current_user.id != comment.blogger_id and current_user.id != comment.post.blogge_id:
         flash("You do not have permission to delete this comment", "warning")
 
     else:
