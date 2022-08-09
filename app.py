@@ -123,7 +123,7 @@ class Comments(db.Model):
     post_id = db.Column(db.Integer, db.ForeignKey('posts.id', ondelete="CASCADE"), nullable=False)
 
     def __repr__(self):
-        return f"Comment('{self.comment}', '{self.date_created}', '{self.user_id}', '{self.post_id}')"
+        return f"Comment('{self.comment}', '{self.date_created}', '{self.blogger_id}', '{self.post_id}')"
 
 
 # ---- USERS DATABASE MODEL -----
