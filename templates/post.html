@@ -11,48 +11,6 @@
         {{ post.content|safe }}<br/><br/>
 
 
-    <!-- SHOW COMMENTS SECTION -->
-        <div class="row">
-            <h5>Comments</h5>
-            {% for comment in post.comments %}
-                <div class="row">
-                    <div class="col-sm-2">
-                        {% if current_user.profile_pic %}
-                            <img src="{{ url_for('static', filename='/img/' + current_user.profile_pic) }}" alt="user profile picture" width="60px" align="right">
-                        {% else %}
-                            <img src="{{ url_for('static', filename='/img/default_pic.png') }}" alt="default profile picture" align="right" width="60px">
-                        {% endif %}
-                    </div>
-
-                    <div class="col-sm-8">
-                        <h6>{{ comment.comment }}</h6>
-                        <p><small class="text-muted">Witten by {{ comment.blogger.first_name }} on {{ comment.date_created }}</small></p>
-                    </div>
-
-                    {% if current_user.id == comment.blogger_id or bloggler_id == post.blogger.id %}
-                    <div class="col-sm-2">
-                        <ul>
-                            <li>
-                                <a class="btn btn-sm btn-primary" href="/delete_comment/{{ comment.id }}" data-class="dropdown-item">Delete</a>
-                            </li>
-                        </ul>
-                    </div>
-                    {% endif %}
-                </div>
-            {% endfor %}
-        </div>
-    <!-- END SHOW COMMENT SECTION -->
-
-    <!-- POST COMMENTS SECTION -->
-        <form action="/add_comment/{{ post.id }}" method="POST" class="form-control">
-            {{ form.hidden_tag() }}
-            {{ form.comment.label(class="form-label") }}
-            {{ form.comment(class="form-control", rows= "10") }}
-            <br />
-            {{ form.submit(class="btn btn-primary") }}
-        </form>
-    <!-- END POST COMMENT SECTION -->
-
 
     {% if post.blogger.about_author %}
         About the blogger: {{ post.blogger.about_author }}
