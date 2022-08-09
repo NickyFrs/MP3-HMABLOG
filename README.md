@@ -171,7 +171,7 @@ Flowchart shows the path for any web application user:.
 ![Sitemap](docs/website-flowchart.png)  
   
 Database schema diagram as used when a user register for an account:
-![Database structure diagram](docs/db-schema.png)  
+![Database structure diagram](docs/db-schema2.png)  
 
 ### Features  
 This section looks at features which were implemented and those that with further research and
