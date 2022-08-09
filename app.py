@@ -45,7 +45,7 @@ app.config['SECRET_KEY'] = 'b41bfb66739bd67d09342ad24f6a699deb7cbac892273d95'
 # app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///hopedb.db'  # Add database
 # Add database
 app.config[
-    'SQLALCHEMY_DATABASE_URI'] = 'postgresql://xxawkgecbrmqhv:cd3626d55ccccf2b591257ad3a9ac43f70d5ab848ceb9d88a87c0320d9694d61@ec2-52-203-118-49.compute-1.amazonaws.com:5432/dbb44fb5r8v208'
+    'SQLALCHEMY_DATABASE_URI'] = 'postgresql://zvcowkhewwcwqg:9031c3fc9cd057a977cfd4b72d4c9be4159572f51b3be0cd4796ca7dc08af84b@ec2-34-227-135-211.compute-1.amazonaws.com:5432/d897pieu6abro1'
 
 db = SQLAlchemy(app)
 migrate = Migrate(app, db)
