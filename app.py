@@ -187,7 +187,6 @@ class Users(db.Model, UserMixin):
         return Users.query.get(user_id)
 
 
-
 # ------------------------- FORMS CREATION -----------------------
 # ---- COMMENTS FORM ----
 class CommentForm(FlaskForm):
