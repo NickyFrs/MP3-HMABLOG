@@ -48,8 +48,6 @@ E
 :
 
 .gitignore,a\5\a5cc2925ca8258af241be7e5b0381edf30266302
-C
-templates/post.html,0\5\057d255c6f140964959b40e92346d8831c25b49d
 G
 templates/add_post.html,e\d\ede77b19b9e221bc79d98d4e77516df78c50c7c0
 D
@@ -66,8 +64,6 @@ p
 @migrations/versions/15746cb6d070_added_last_seen_column_to_db.py,2\f\2f0d0fd9d81769c2644dffeca0196f4c4493639a
 H
 templates/edit_post.html,c\c\cc90fa623a65aae04f35b604e942bf2005dfea97
-D
-templates/posts.html,1\7\17b681f0d13f193b2b86c027cbf46fbf2cd926cb
 H
 templates/edit_note.html,5\1\51c86fb916a87d392cbb6fd13702b4d380107ff7
 G
@@ -78,8 +74,6 @@ C
 templates/home.html,8\6\86f3a00c4de0ad1280042b4c75ce3672e5141a0f
 C
 templates/base.html,d\a\da7c237b85a69c00a9ab8c189bf63e22070fcac3
-H
-templates/dashboard.html,1\9\193f98aa913c5a3f5c398c0a9a3c7257df4114a3
 =
 READMEcopy.md,a\8\a8e6cc1fb68e33baecb20892e3173563854c3092
 9

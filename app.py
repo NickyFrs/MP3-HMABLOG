@@ -8,6 +8,7 @@ from bson import ObjectId
 from flask import Flask, render_template, \
     flash, request, redirect, url_for, session
 from flask_wtf import FlaskForm
+from sqlalchemy import func
 from werkzeug.security import generate_password_hash, check_password_hash
 # to secure the name of the uploaded file
 from werkzeug.utils import secure_filename
@@ -107,6 +108,23 @@ class Posts(db.Model):
     # Foreing Key
     blogger_id = db.Column(db.Integer, db.ForeignKey('users.id'))
 
+    # DB Relationship
+    comments = db.relationship('Comments', backref="posts", lazy=True)
+
+
+# ------------ COMMENTS DATABASE MODEL ----------
+class Comments(db.Model):
+    id = db.Column(db.Integer(), primary_key=True)
+    comment = db.Column(db.String(255))
+    date_created = db.Column(db.DateTime(timezone=True), default=func.now())
+
+    # Foreing Key
+    blogger_id = db.Column(db.Integer, db.ForeignKey('users.id', ondelete="CASCADE"))
+    post_id = db.Column(db.Integer, db.ForeignKey('posts.id', ondelete="CASCADE"), nullable=False)
+
+    def __repr__(self):
+        return f"Comment('{self.comment}', '{self.date_created}', '{self.user_id}', '{self.post_id}')"
+
 
 # ---- USERS DATABASE MODEL -----
 class Users(db.Model, UserMixin):
@@ -123,6 +141,7 @@ class Users(db.Model, UserMixin):
 
     # Manny posts to an user
     posts = db.relationship("Posts", backref="blogger")
+    comments = db.relationship('Comments', backref="user", passive_deletes=True)
 
     # PASSWORD HASHING
     password_hash = db.Column(db.String(128))
@@ -165,6 +184,12 @@ class Users(db.Model, UserMixin):
 
 
 # ------------------------- FORMS CREATION -----------------------
+# ---- COMMENTS FORM ----
+class CommentForm(FlaskForm):
+    comment = CKEditorField("Comment", validators=[DataRequired()])
+    submit = SubmitField('Send')
+
+
 # ---- LOGIN FORM ----
 class LoginForm(FlaskForm):
     # username = StringField("Username", validators=[DataRequired()])
@@ -706,6 +731,63 @@ def posts():
     return render_template('posts.html', posts=posts)
 
 
+# --- ADD COMMENT PAGE ---
+@app.route('/add_comment/<post_id>', methods=['POST'])
+@login_required
+def add_comment(post_id):
+    form = CommentForm()
+    blogger_id = current_user.id
+    id = post_id
+    if request.method == 'POST':
+
+        if form.validate_on_submit():
+            post = Posts.query.filter_by(id=post_id)
+            content = form.comment.data
+
+            if not content:
+                flash("Comment cannot be empty", "warning")
+            else:
+
+                if post:
+                    post_comment = Comments(comment=content, blogger_id=blogger_id, post_id=post_id)
+                    form.comment.data = ''
+
+                    # add post to the database
+                    db.session.add(post_comment)
+                    db.session.commit()
+                    flash('Blog comment added', 'success')
+                    return redirect(url_for('post', post_id=post_id, id=id, form=form))
+
+                else:
+                    flash("Post doesn't exist", "danger")
+
+    # Return message
+    return redirect(url_for("posts"))
+
+
+# --- DELETE COMMENT PAGE ---
+@app.route('/delete_comment/<comment_id>', methods=['GET', 'POST'])
+@login_required
+def delete_comment(comment_id):
+
+    comment = Comments.query.filter_by(id=comment_id).first()
+
+    if not comment:
+        flash("Comment not found", "warning")
+
+    elif current_user.id != comment.blogger.id and current_user.id != comment.post.blogger:
+        flash("You do not have permission to delete this comment", "warning")
+
+    else:
+        db.session.delete(comment)
+        db.session.commit()
+
+        flash('Comment delete', 'success')
+
+
+    return redirect(url_for('posts'))
+
+
 # --- DELETE POST FROM THE DATABASE ---
 # INT:ID WILL LET UD EDIT AND INDIVIDUAL POST
 @app.route('/posts/delete/<int:id>')
@@ -785,6 +867,7 @@ def edit_post(id):
 # INT:ID WILL GET THE CLICKED POST TO VIEW FROM THE DB
 @login_required
 def post(id):
+
     # grab all the posts from the database
     post = Posts.query.get_or_404(id)
     return render_template('post.html', post=post)
