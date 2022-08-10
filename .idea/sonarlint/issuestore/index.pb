@@ -45,9 +45,6 @@ r
 Bmigrations/versions/c51115bd79de_added_a_couple_of_fields_to_db.py,b\e\be192e863dda2734b6f23375a06c4d5c7f1ec281
 E
 templates/navbar.html,2\1\2152ecc432cb8e2a5acad94785c9a8c5a8df8cac
-:
-
-.gitignore,a\5\a5cc2925ca8258af241be7e5b0381edf30266302
 G
 templates/add_post.html,e\d\ede77b19b9e221bc79d98d4e77516df78c50c7c0
 D
@@ -74,7 +71,5 @@ C
 templates/home.html,8\6\86f3a00c4de0ad1280042b4c75ce3672e5141a0f
 C
 templates/base.html,d\a\da7c237b85a69c00a9ab8c189bf63e22070fcac3
-9
-	README.md,8\e\8ec9a00bfd09b3190ac6b22251dbb1aa95a0579d
 H
 templates/dashboard.html,1\9\193f98aa913c5a3f5c398c0a9a3c7257df4114a3

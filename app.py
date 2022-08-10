@@ -1,7 +1,8 @@
 import os
+import pymongo
 import uuid as uuid  # created unique user id
 import jwt
-
+from env import cluster
 from time import time
 
 from bson import ObjectId
@@ -37,22 +38,21 @@ if os.path.exists("env.py"):
 
 # APP CONFIGURATION
 # necessary for the forms
-app.config['SECRET_KEY'] = 'b41bfb66739bd67d09342ad24f6a699deb7cbac892273d95'
+app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY')
+
 
 # ----------- DATABASE CONFIGURATION SETTINGS ------------------
 
 # DATABASE SETTINGS
 # Add database
 # app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///hopedb.db'
-app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://zvcowkhewwcwqg:9031c3fc9cd057a977cfd4b72d4c9be4159572f51b3be0cd4796ca7dc08af84b@ec2-34-227-135-211.compute-1.amazonaws.com:5432/d897pieu6abro1'
+app.config['SQLALCHEMY_DATABASE_URI'] = os.environ.get('SQLALCHEMY_DATABASE_URI')
 
 db = SQLAlchemy(app)
 migrate = Migrate(app, db)
 
 # -------- MONGO DB CONFIGURATION SETTINGS ------------------
 # MongDB database access
-cluster = MongoClient("mongodb+srv://dbAuth:Ch3rl1na10@cluster0.rqlwn.mongodb.net/?retryWrites=true&w=majority")
-
 mongo = PyMongo()
 notesdb = cluster["hopeblog"]
 
@@ -88,11 +88,13 @@ notesdb = cluster["hopeblog"]
 # FLASK LOGIN CONFIGURATION AND INITIALIZATION
 login_manager = LoginManager()
 login_manager.init_app(app)
-login_manager.login_view = 'login'  # where should the user be redirected if we are not logged in and a login is required
+# where should the user be redirected if we are not
+# logged in and a login is required
+login_manager.login_view = 'login'
 
 # SET LOCAL FOLDER TO SAVE FILES FOR USER PROFILE
-UPLOAD_FOLDER = '/Users/New User/Desktop/MP3-HMABLOG/static/img/'
-app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
+
+app.config['UPLOAD_FOLDER'] = os.environ.get('UPLOAD_FOLDER')
 
 
 # --------------------- DATABASE MODELS ------------------------
@@ -118,8 +120,10 @@ class Comments(db.Model):
     date_created = db.Column(db.DateTime(timezone=True), default=func.now())
 
     # Foreing Key
-    blogger_id = db.Column(db.Integer, db.ForeignKey('users.id', ondelete="CASCADE"))
-    post_id = db.Column(db.Integer, db.ForeignKey('posts.id', ondelete="CASCADE"), nullable=False)
+    blogger_id = db.Column(
+        db.Integer, db.ForeignKey('users.id', ondelete="CASCADE"))
+    post_id = db.Column(
+        db.Integer, db.ForeignKey('posts.id', ondelete="CASCADE"), nullable=False)
 
     def __repr__(self):
         return f"Comment('{self.comment}', '{self.date_created}', '{self.blogger_id}', '{self.post_id}')"
