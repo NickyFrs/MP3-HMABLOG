@@ -45,7 +45,7 @@ app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY')
 
 # DATABASE SETTINGS
 # Add database
-# app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///hopedb.db'
+app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///hopedb.db'
 app.config['SQLALCHEMY_DATABASE_URI'] = os.environ.get('SQLALCHEMY_DATABASE_URI')
 
 db = SQLAlchemy(app)
