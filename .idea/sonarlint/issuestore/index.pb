@@ -67,3 +67,7 @@ D
 templates/notes.html,a\8\a898851c516a986e71f4b7e49d8a1e336433a70f
 H
 templates/dashboard.html,1\9\193f98aa913c5a3f5c398c0a9a3c7257df4114a3
+C
+templates/home.html,8\6\86f3a00c4de0ad1280042b4c75ce3672e5141a0f
+C
+templates/base.html,d\a\da7c237b85a69c00a9ab8c189bf63e22070fcac3
