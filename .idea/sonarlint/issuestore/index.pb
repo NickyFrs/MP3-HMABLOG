@@ -27,8 +27,6 @@ y
 Imigrations/versions/7aa41e035773_added_a_new_about_author_col_to_user_.py,4\6\4601d9946c73ea13fbbc0cd0de0a9727f6331f30
 F
 templates/sidebar.html,f\c\fc5076aef05296bf5873515cbf4523c73347b0db
-9
-	config.py,1\a\1a1b9769344cb239f2e540e1e6ee1efa2d3034ea
 D
 templates/admin.html,a\0\a02f370c569f95c7384578e9a07175aef619ad13
 N
@@ -67,9 +65,5 @@ G
 templates/add_note.html,6\e\6e2ae7d6891c15332cb644ec4bdb5fbf57a67330
 D
 templates/notes.html,a\8\a898851c516a986e71f4b7e49d8a1e336433a70f
-C
-templates/home.html,8\6\86f3a00c4de0ad1280042b4c75ce3672e5141a0f
-C
-templates/base.html,d\a\da7c237b85a69c00a9ab8c189bf63e22070fcac3
 H
 templates/dashboard.html,1\9\193f98aa913c5a3f5c398c0a9a3c7257df4114a3
