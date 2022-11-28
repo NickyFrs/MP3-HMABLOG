@@ -2,7 +2,7 @@ import os
 import pymongo
 import uuid as uuid  # created unique user id
 import jwt
-# from env import cluster
+from env import cluster
 from time import time
 
 from bson import ObjectId
@@ -53,10 +53,9 @@ migrate = Migrate(app, db)
 
 # -------- MONGO DB CONFIGURATION SETTINGS ------------------
 # MongDB database access
-cluster = os.environ.get('CLUSTER')
 mongo = PyMongo()
 notesdb = cluster["hopeblog"]
-# notesdb = os.environ.get['MongoClient']
+
 
 # ---- MAIL CONFIGURATION (Future Feature) ---------
 # TELL APP HOW TO SEND EMAIL
