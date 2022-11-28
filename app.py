@@ -56,6 +56,7 @@ migrate = Migrate(app, db)
 mongo = PyMongo()
 notesdb = cluster["hopeblog"]
 
+
 # ---- MAIL CONFIGURATION (Future Feature) ---------
 # TELL APP HOW TO SEND EMAIL
 # your mail server
