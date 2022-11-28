@@ -2,7 +2,7 @@ import os
 import pymongo
 import uuid as uuid  # created unique user id
 import jwt
-from env import cluster
+# from env import cluster
 from time import time
 
 from bson import ObjectId
