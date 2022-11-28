@@ -53,6 +53,7 @@ migrate = Migrate(app, db)
 
 # -------- MONGO DB CONFIGURATION SETTINGS ------------------
 # MongDB database access
+cluster = os.environ.get('CLUSTER')
 mongo = PyMongo()
 notesdb = cluster["hopeblog"]
 # notesdb = os.environ.get['MongoClient']
